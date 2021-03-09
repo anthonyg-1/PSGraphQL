@@ -71,8 +71,6 @@ function Invoke-GraphQLQuery {
             Position = 3)][Alias("r")][Switch]$Raw
     )
     PROCESS {
-        #requires -Version 5
-
         $cleanedQuery = $Query -replace '\s+', ' '
         $jsonRequestBody = ""
 
