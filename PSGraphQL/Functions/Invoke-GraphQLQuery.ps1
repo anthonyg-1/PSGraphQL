@@ -3,9 +3,9 @@ function Invoke-GraphQLQuery {
     .SYNOPSIS
         Sends a query to a GraphQL endpoint.
     .DESCRIPTION
-        Sends a query (read operation) or mutation (create, update, delete operation) to a GraphQL endpoint. Default return type is PSCustomObject but raw JSON can be returned via the -Raw switch.
+        Sends a query (read operation) or mutation (create, update, delete operation) to a GraphQL endpoint.
     .NOTES
-        Requires version 5.1 or above.
+        Mutation results are returned as JSON strings while query results are implicitly returned as objects. To return a query result as JSON, use the -Raw switch.
     .EXAMPLE
         $url = "https://mytargetserver/v1/graphql"
 
@@ -24,7 +24,7 @@ function Invoke-GraphQLQuery {
 
         Invoke-GraphQLQuery -Query $myQuery -Uri $url -Headers $requestHeaders -Raw
 
-        Sends a GraphQL query to the endpoint 'https://mytargetserver/v1/graphql' with the results returned raw (as JSON
+        Sends a GraphQL query to the endpoint 'https://mytargetserver/v1/graphql' with the results returned as JSON.
     .EXAMPLE
         $url = "https://mytargetserver/v1/graphql"
 
@@ -45,6 +45,22 @@ function Invoke-GraphQLQuery {
         $result.data.users | Format-Table
 
         Sends a GraphQL query to the endpoint 'https://mytargetserver/v1/graphql' with the results returned as an object and navigates the hierarchy to return a table view of users.
+    .EXAMPLE
+        $url = "https://mytargetserver/v1/graphql"
+
+        $myMutation = '
+            mutation MyMutation {
+                insert_users_one(object: {id: "57", name: "FirstName LastName"}) {
+                id
+            }
+        }
+        '
+
+        $requestHeaders = @{ myApiKey="aoMGY{+93dx&t!5)VMu4pI8U8T.ULO" }
+
+        $jsonResult = Invoke-GraphQLQuery -Mutation $myMutation -Uri $url -Headers $requestHeaders
+
+        Sends a GraphQL mutation to the endpoint 'https://mytargetserver/v1/graphql' with the results returned as JSON.
     .LINK
         https://graphql.org/
         Format-Table
@@ -66,16 +82,15 @@ function Invoke-GraphQLQuery {
             ValueFromPipelineByPropertyName = $false,
             Position = 2)][Alias("h")][System.Collections.Hashtable]$Headers,
 
-
         [Parameter(Mandatory = $false,ParameterSetName="JSON",
             Position = 3)][Alias("AsJson","json","r")][Switch]$Raw
     )
     PROCESS {
-        $cleanedQuery = $Query -replace '\s+', ' '
-        $jsonRequestBody = ""
+        [string]$cleanedInput = $Query -replace '\s+', ' '
+        [string]$jsonRequestBody = ""
 
         try {
-            $jsonRequestBody = @{query = $cleanedQuery } | ConvertTo-Json -Compress -ErrorAction Stop
+            $jsonRequestBody = @{query = $cleanedInput } | ConvertTo-Json -Compress -ErrorAction Stop
         }
         catch {
             Write-Error -Exception $_.Exception -ErrorAction Stop
@@ -89,7 +104,12 @@ function Invoke-GraphQLQuery {
             Write-Error -Exception $_.Exception -ErrorAction Stop
         }
 
-        if ($PSBoundParameters.ContainsKey("Raw")) {
+        [bool]$isMutation = $false
+        if ($cleanedInput.ToLower() -match "mutation ") {
+            $isMutation = $true
+        }
+
+        if ($PSBoundParameters.ContainsKey("Raw") -or $isMutation) {
             try {
                 return $($response | ConvertTo-Json -Depth 100 -ErrorAction Stop)
             }
