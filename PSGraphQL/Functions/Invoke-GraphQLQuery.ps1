@@ -68,7 +68,7 @@ function Invoke-GraphQLQuery {
 
 
         [Parameter(Mandatory = $false,ParameterSetName="JSON",
-            Position = 3)][Alias("r")][Switch]$Raw
+            Position = 3)][Alias("AsJson","json","r")][Switch]$Raw
     )
     PROCESS {
         $cleanedQuery = $Query -replace '\s+', ' '
@@ -83,7 +83,7 @@ function Invoke-GraphQLQuery {
 
         $response = $null
         try {
-            $response = Invoke-WebRequest -Uri $Uri -Method Post -Headers $Headers -Body $jsonRequestBody -ContentType "application/json" -ErrorAction Stop
+            $response = Invoke-RestMethod -Uri $Uri -Method Post -Headers $Headers -Body $jsonRequestBody -ContentType "application/json" -ErrorAction Stop
         }
         catch {
             Write-Error -Exception $_.Exception -ErrorAction Stop
@@ -91,7 +91,7 @@ function Invoke-GraphQLQuery {
 
         if ($PSBoundParameters.ContainsKey("Raw")) {
             try {
-                return $($response.Content | ConvertFrom-Json -ErrorAction Stop | ConvertTo-Json -Depth 100 -ErrorAction Stop)
+                return $($response | ConvertTo-Json -Depth 100 -ErrorAction Stop)
             }
             catch {
                 Write-Error -Exception $_.Exception -ErrorAction Stop
@@ -99,7 +99,7 @@ function Invoke-GraphQLQuery {
         }
         else {
             try {
-                return $($response.Content | ConvertFrom-Json -ErrorAction Stop)
+                return $response
             }
             catch {
                 Write-Error -Exception $_.Exception -ErrorAction Stop
