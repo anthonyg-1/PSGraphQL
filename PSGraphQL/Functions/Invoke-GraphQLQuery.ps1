@@ -13,7 +13,7 @@ function Invoke-GraphQLQuery {
     .PARAMETER Raw
         Tells the function to return JSON as opposed to objects.
     .NOTES
-        Query and mutation default return type is a collection of objects. To return a query result as JSON, use the -Raw switch.
+        Query and mutation default return type is a collection of objects. To return results as JSON, use the -Raw switch.
     .EXAMPLE
         $url = "https://mytargetserver/v1/graphql"
 
