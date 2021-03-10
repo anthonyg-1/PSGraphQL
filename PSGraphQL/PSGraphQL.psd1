@@ -13,7 +13,7 @@
 RootModule = '.\PSGraphQL'
 
 # Version number of this module.
-ModuleVersion = '0.0.4'
+ModuleVersion = '0.0.5'
 
 # ID used to uniquely identify this module
 GUID = '06f56284-848d-4070-9636-9c95e7cdf5be'
