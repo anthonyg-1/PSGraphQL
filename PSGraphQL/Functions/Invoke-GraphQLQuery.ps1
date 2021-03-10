@@ -87,8 +87,8 @@ function Invoke-GraphQLQuery {
     )
     PROCESS {
         [string]$cleanedInput = $Query -replace '\s+', ' '
-        [string]$jsonRequestBody = ""
 
+        [string]$jsonRequestBody = ""
         try {
             $jsonRequestBody = @{query = $cleanedInput } | ConvertTo-Json -Compress -ErrorAction Stop
         }
