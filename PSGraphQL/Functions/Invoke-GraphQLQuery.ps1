@@ -11,9 +11,9 @@ function Invoke-GraphQLQuery {
     .PARAMETER Uri
         Specifies the Uniform Resource Identifier (URI) of the GraphQL endpoint to which the query or mutation is sent.
     .PARAMETER Raw
-        For queries (not mutations) only. Tells the function to return JSON as opposed to objects.
+        Tells the function to return JSON as opposed to objects.
     .NOTES
-        Mutation results are returned as JSON strings while query results are implicitly returned as objects. To return a query result as JSON, use the -Raw switch.
+        Query and mutation default return type is a collection of objects. To return a query result as JSON, use the -Raw switch.
     .EXAMPLE
         $url = "https://mytargetserver/v1/graphql"
 
@@ -66,7 +66,7 @@ function Invoke-GraphQLQuery {
 
         $requestHeaders = @{ myApiKey="aoMGY{+93dx&t!5)VMu4pI8U8T.ULO" }
 
-        $jsonResult = Invoke-GraphQLQuery -Mutation $myMutation -Headers $requestHeaders -Uri $url
+        $jsonResult = Invoke-GraphQLQuery -Mutation $myMutation -Headers $requestHeaders -Uri $url -Raw
 
         Sends a GraphQL mutation to the endpoint 'https://mytargetserver/v1/graphql' with the results returned as JSON.
     .LINK
@@ -112,12 +112,7 @@ function Invoke-GraphQLQuery {
             Write-Error -Exception $_.Exception -ErrorAction Stop
         }
 
-        [bool]$isMutation = $false
-        if ($cleanedInput.ToLower() -match "mutation ") {
-            $isMutation = $true
-        }
-
-        if ($PSBoundParameters.ContainsKey("Raw") -or $isMutation) {
+        if ($PSBoundParameters.ContainsKey("Raw")) {
             try {
                 return $($response | ConvertTo-Json -Depth 100 -ErrorAction Stop)
             }
