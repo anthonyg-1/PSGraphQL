@@ -74,7 +74,7 @@ function Invoke-GraphQLQuery {
         Format-Table
     #>
     [CmdletBinding()]
-    [Alias("Invoke-GraphQLMutation","gql")]
+    [Alias("gql")]
     [OutputType([System.Management.Automation.PSCustomObject],[System.String])]
     Param
     (
