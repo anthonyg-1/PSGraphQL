@@ -8,6 +8,7 @@ This PowerShell module contains functions that facilitate querying and create, u
 ```powershell
 
 $url = "https://mytargetserver/v1/graphql"
+
 $myQuery = '
 query {
   users {
