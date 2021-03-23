@@ -10,6 +10,8 @@ function Invoke-GraphQLQuery {
         Specifies the headers of the web request. Enter a hash table or dictionary.
     .PARAMETER Uri
         Specifies the Uniform Resource Identifier (URI) of the GraphQL endpoint to which the query or mutation is sent.
+    .PARAMETER WebSession
+        Specifies a web request session. Enter the variable name, including the dollar sign (`$`).
     .PARAMETER Raw
         Tells the function to return JSON as opposed to objects.
     .NOTES
@@ -69,6 +71,20 @@ function Invoke-GraphQLQuery {
         $jsonResult = Invoke-GraphQLQuery -Mutation $myMutation -Headers $requestHeaders -Uri $url -Raw
 
         Sends a GraphQL mutation to the endpoint 'https://mytargetserver/v1/graphql' with the results returned as JSON.
+    .EXAMPLE
+        $targetHost = "gqlserver01"
+        $gqlEndpointUri = "https://{0}/graphql" -f $targetHost
+
+        $session = [Microsoft.PowerShell.Commands.WebRequestSession]::new()
+        $cookine = [System.Net.Cookie]::new()
+        $cookie.Name = "env"
+        $cookie.Value = "dCLaUp2JSy2-+R#LSOa#IA7xsD"
+        $cookie.Domain = $targetHost
+        $session.Cookies.Add($cookie)
+
+        Invoke-GraphQLQuery -Query $reconQuery -Uri $gqlEndpointUri -WebSession $session -Raw
+
+        Initiates a GraphQL query with the web request session defined in the $session variable.
     .LINK
         https://graphql.org/
         Format-Table
@@ -90,8 +106,12 @@ function Invoke-GraphQLQuery {
             ValueFromPipelineByPropertyName = $false,
             Position = 2)][Alias("u")][System.Uri]$Uri,
 
+        [Parameter(Mandatory = $false,
+            ValueFromPipelineByPropertyName = $false,
+            Position = 3)][Microsoft.PowerShell.Commands.WebRequestSession]$WebSession,
+
         [Parameter(Mandatory = $false,ParameterSetName="JSON",
-            Position = 3)][Alias("AsJson","json","r")][Switch]$Raw
+            Position = 4)][Alias("AsJson","json","r")][Switch]$Raw
     )
     PROCESS {
         [string]$cleanedInput = $Query -replace '\s+', ' '
@@ -104,9 +124,23 @@ function Invoke-GraphQLQuery {
             Write-Error -Exception $_.Exception -ErrorAction Stop
         }
 
+        $params = @{Uri=$Uri
+                    Method="Post"
+                    Body=$jsonRequestBody
+                    ContentType="application/json"
+                    ErrorAction="Stop"}
+
+        if ($PSBoundParameters.ContainsKey("Headers")) {
+            $params.Add("Headers",$Headers)
+        }
+
+        if ($PSBoundParameters.ContainsKey("WebSession")) {
+            $params.Add("WebSession",$WebSession)
+        }
+
         $response = $null
         try {
-            $response = Invoke-RestMethod -Uri $Uri -Method Post -Headers $Headers -Body $jsonRequestBody -ContentType "application/json" -ErrorAction Stop
+            $response = Invoke-RestMethod @params
         }
         catch {
             Write-Error -Exception $_.Exception -ErrorAction Stop
