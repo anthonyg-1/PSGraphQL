@@ -43,7 +43,7 @@ $jsonResult = Invoke-GraphQLQuery -Mutation $myMutation -Headers $requestHeaders
 
 # Damn Vulnerable GraphQL Application Solutions
 
-Damn Vulnerable GraphQL Application is an intentionally vulnerable implementation of Facebook's GraphQL technology, to learn and practice GraphQL Security. For more on DVGQL, please see: https://github.com/dolevf/Damn-Vulnerable-GraphQL-Application
+Damn Vulnerable GraphQL Application is an intentionally vulnerable implementation of the GraphQL technology that allows a tester to learn and practice GraphQL Security. For more on DVGQL, please see: https://github.com/dolevf/Damn-Vulnerable-GraphQL-Application
 
 The solutions below are written in PowerShell exclusively but two of the solutions required Invoke-WebRequest as opposed to this modules Invoke-GraphQLQuery.
 
