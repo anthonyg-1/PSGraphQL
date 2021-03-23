@@ -199,7 +199,7 @@ mutation  {
 
 $result = Invoke-GraphQLQuery -Mutation $commandInjectionMutation -Uri $gqlEndpointUri
 
-$result.data.importPaste.result
+Write-Host -Object $result.data.importPaste.result -ForegroundColor Magenta
 ```
 
 
@@ -347,7 +347,7 @@ foreach ($pw in $passwordList)
           systemDiagnostics(username: "admin", password: "' + $pw + '", cmd: "' + $command + '")
         }
     '
-    
+
     $result = Invoke-GraphQLQuery -Query $bruteForceAuthQuery -Uri $gqlEndpointUri
 
     if ($result.data.systemDiagnostics -ne "Password Incorrect") {
