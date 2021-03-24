@@ -219,7 +219,7 @@ Invoke-GraphQLQuery -Query $commandInjectionQuery -Uri $gqlEndpointUri -Raw
 
 ```
 
-## Code Execution - OS Command Injection #3
+## Code Execution :: OS Command Injection #3
 ```powershell
 # Admin creds for DVGQL:
 $userName = "admin"
