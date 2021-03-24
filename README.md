@@ -191,9 +191,11 @@ mutation  {
     }
 '
 
-$result = Invoke-GraphQLQuery -Mutation $commandInjectionMutation -Uri $gqlEndpointUri
+$response = Invoke-GraphQLQuery -Mutation $commandInjectionMutation -Uri $gqlEndpointUri
 
-Write-Host -Object $result.data.importPaste.result -ForegroundColor Magenta
+$result = $response.data.importPaste.result
+
+Write-Host -Object $result -ForegroundColor Magenta
 ```
 
 
