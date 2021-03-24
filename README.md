@@ -311,8 +311,8 @@ $cookie = [System.Net.Cookie]::new()
 $cookie.Name = "env"
 # $cookie.Value = "Z3JhcGhpcWw6ZGlzYWJsZQ" # This is base64 for graphiql:disable
 $cookie.Value = "Z3JhcGhpcWw6ZW5hYmxl" # This is base64 for graphiql:enable
-$targetHost = [Uri]::new($gqlEndpointUri).Host
-$cookie.Domain = $targetHost
+$domain = [Uri]::new($gqlEndpointUri).Host
+$cookie.Domain = $domain
 $session.Cookies.Add($cookie)
 
 Invoke-GraphQLQuery -Query $reconQuery -Uri $gqlEndpointUri -WebSession $session -Raw
