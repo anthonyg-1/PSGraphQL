@@ -181,7 +181,7 @@ Invoke-GraphQLQuery -Mutation $requestForgeryMutation -Uri $gqlEndpointUri -Raw
 
 ## Code Execution :: OS Command Injection #1
 ```powershell
-$commandToInject = "ls -alr"
+$commandToInject = "ls -al"
 
 $commandInjectionMutation = '
 mutation  {
