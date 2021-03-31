@@ -41,9 +41,9 @@ PrivateData = @{
     PSData = @{
         Tags = @("GraphQL")
 
-        # LicenseUri = "https://github.com/anthonyg-1/PSGraphQL/blob/main/LICENSE"
+        LicenseUri = "https://github.com/anthonyg-1/PSGraphQL/blob/main/LICENSE"
 
-        # ProjectUri = "https://github.com/anthonyg-1/PSGraphQL"
+        ProjectUri = "https://github.com/anthonyg-1/PSGraphQL"
 
     } # End PSData
 
