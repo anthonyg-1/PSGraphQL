@@ -1,14 +1,14 @@
 #requires -Module Pester
 #requires -Module PSScriptAnalyzer
 
-$here = Split-Path -Parent $MyInvocation.MyCommand.Path
+$myDefaultDirectory = Get-Location
 
-Set-Location -Path $here
+Set-Location -Path $myDefaultDirectory
 Set-Location -Path ..
 
 $module = 'PSGraphQL'
 
-$moduleDirectory = Get-Item -Path ../$module | Select-Object -ExpandProperty FullName
+$moduleDirectory = Get-Item -Path $myDefaultDirectory | Select-Object -ExpandProperty FullName
 
 Clear-Host
 
