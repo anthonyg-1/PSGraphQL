@@ -7,9 +7,9 @@ function Invoke-GraphQLQuery {
     .PARAMETER Query
         The GraphQL query or mutation to send to the endpoint.
     .PARAMETER Headers
-        Specifies the headers of the web request. Enter a hash table or dictionary.
+        Specifies the headers of the web request expressed as a hash table.
     .PARAMETER Uri
-        Specifies the Uniform Resource Identifier (URI) of the GraphQL endpoint to which the query or mutation is sent.
+        Specifies the Uniform Resource Identifier (URI) of the GraphQL endpoint to which the GraphQL query or mutation is sent.
     .PARAMETER WebSession
         Specifies a web request session. Enter the variable name, including the dollar sign (`$`).
     .PARAMETER Raw
