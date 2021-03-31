@@ -6,6 +6,15 @@ This PowerShell module contains functions that facilitate querying and create, u
 :penguin: `Linux`  
 :apple: `MacOS`    
 
+## Installation and Usage
+
+Installing the module.
+
+```powershell
+# Install module
+Install-Module -Name PSGraphQL -Repository PSGallery
+```
+
 ## Examples
 
 ### Send a GraphQL query to an endpoint with the results returned as objects
