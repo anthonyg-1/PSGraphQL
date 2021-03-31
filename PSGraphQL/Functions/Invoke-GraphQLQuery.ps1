@@ -1,7 +1,7 @@
 function Invoke-GraphQLQuery {
     <#
     .SYNOPSIS
-        Sends a query to a GraphQL endpoint.
+        Sends a query or mutation to a GraphQL endpoint.
     .DESCRIPTION
         Sends a query (read operation) or mutation (create, update, delete operation) to a GraphQL endpoint.
     .PARAMETER Query
