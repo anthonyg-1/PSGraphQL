@@ -25,7 +25,9 @@ jobs:
       - task: PowerShell@2
         inputs:
           targetType: 'inline'
-          script: 'Invoke-Pester'
+          script: |
+            Import-Module -Name Pester -Version 4.10.1
+            Invoke-Pester
       - task: CopyFiles@2
         displayName: 'Copy Module Source to Staging'
         inputs:
