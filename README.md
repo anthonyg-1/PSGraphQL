@@ -20,7 +20,7 @@ Install-Module -Name PSGraphQL -Repository PSGallery -Scope CurrentUser
 ### Send a GraphQL query to an endpoint with the results returned as objects
 
 ```powershell
-$url = "https://mytargetserver/v1/graphql"
+$uri = "https://mytargetserver/v1/graphql"
 
 $myQuery = '
 query {
@@ -32,15 +32,14 @@ query {
   }
 }
 '
-$requestHeaders = @{ myApiKey="aoMGY{+93dx&t!5)VMu4pI8U8T.ULO" }
 
-Invoke-GraphQLQuery -Query $myQuery -Headers $requestHeaders -Uri $url
+Invoke-GraphQLQuery -Query $myQuery -Uri $uri
 ```
 
 ### Send a GraphQL mutation to an endpoint with the results returned as JSON
 
 ```powershell
-$url = "https://mytargetserver/v1/graphql"
+$uri = "https://mytargetserver/v1/graphql"
 
 $myMutation = '
     mutation MyMutation {
@@ -50,9 +49,9 @@ $myMutation = '
 }
 '
 
-$requestHeaders = @{ myApiKey="aoMGY{+93dx&t!5)VMu4pI8U8T.ULO" }
+$requestHeaders = @{ "x-api-key"="aoMGY{+93dx&t!5)VMu4pI8U8T.ULO" }
 
-$jsonResult = Invoke-GraphQLQuery -Mutation $myMutation -Headers $requestHeaders -Uri $url -Raw
+$jsonResult = Invoke-GraphQLQuery -Mutation $myMutation -Headers $requestHeaders -Uri $uri -Raw
 ```
 
 # Damn Vulnerable GraphQL Application Solutions
