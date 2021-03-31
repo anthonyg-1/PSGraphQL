@@ -1,6 +1,11 @@
 # PSGraphQL
 This PowerShell module contains functions that facilitate querying and create, update, and delete (mutations) operations for GraphQL endpoints.
 
+### Tested on
+:desktop_computer: `Windows 10`  
+:penguin: `Linux`  
+:apple: `MacOS`    
+
 ## Examples
 
 ### Send a GraphQL query to an endpoint with the results returned as objects
