@@ -12,7 +12,7 @@ Installing the module.
 
 ```powershell
 # Install module
-Install-Module -Name PSGraphQL -Repository PSGallery
+Install-Module -Name PSGraphQL -Repository PSGallery -Scope CurrenUser
 ```
 
 ## Examples
