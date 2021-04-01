@@ -17,46 +17,60 @@ function Invoke-GraphQLQuery {
     .NOTES
         Query and mutation default return type is a collection of objects. To return results as JSON, use the -Raw switch.
     .EXAMPLE
-        $url = "https://mytargetserver/v1/graphql"
+        $uri = "https://mytargetserver/v1/graphql"
 
-        $myQuery = '
-        query {
-          users {
-            created_at
-            id
-            last_seen
-            name
-          }
-        }
+        $introspectionQuery = '
+            query allSchemaTypes {
+                __schema {
+                    types {
+                        name
+                        kind
+                        description
+                    }
+                }
+            }
         '
 
-        $requestHeaders = @{ myApiKey="aoMGY{+93dx&t!5)VMu4pI8U8T.ULO" }
+        Invoke-GraphQLQuery -Query $introspectionQuery -Uri $uri -Raw
 
-        Invoke-GraphQLQuery -Query $myQuery -Headers $requestHeaders -Uri $url -Raw
+        Sends a GraphQL introspection query to the endpoint 'https://mytargetserver/v1/graphql' with the results returned as JSON.
+    .EXAMPLE
+        $uri = "https://mytargetserver/v1/graphql"
+
+        $myQuery = '
+            query GetUsers {
+                users {
+                    created_at
+                    id
+                    last_seen
+                    name
+                }
+            }
+        '
+
+        Invoke-GraphQLQuery -Query $myQuery -Uri $uri -Raw
 
         Sends a GraphQL query to the endpoint 'https://mytargetserver/v1/graphql' with the results returned as JSON.
     .EXAMPLE
-        $url = "https://mytargetserver/v1/graphql"
+        $uri = "https://mytargetserver/v1/graphql"
 
         $myQuery = '
-        query {
-          users {
-            created_at
-            id
-            last_seen
-            name
-          }
+            query GetUsers {
+                users {
+                    created_at
+                    id
+                    last_seen
+                    name
+            }
         }
         '
 
-        $requestHeaders = @{ myApiKey="aoMGY{+93dx&t!5)VMu4pI8U8T.ULO" }
-
-        $result = Invoke-GraphQLQuery -Query $myQuery -Headers $requestHeaders -Uri $url
+        $result = Invoke-GraphQLQuery -Query $myQuery -Uri $uri
         $result.data.users | Format-Table
 
-        Sends a GraphQL query to the endpoint 'https://mytargetserver/v1/graphql' with the results returned as an object and navigates the hierarchy to return a table view of users.
+        Sends a GraphQL query to the endpoint 'https://mytargetserver/v1/graphql' with the results returned as objects and navigates the hierarchy to return a table view of users.
     .EXAMPLE
-        $url = "https://mytargetserver/v1/graphql"
+        $uri = "https://mytargetserver/v1/graphql"
 
         $myMutation = '
             mutation MyMutation {
@@ -66,37 +80,27 @@ function Invoke-GraphQLQuery {
         }
         '
 
-        $requestHeaders = @{ myApiKey="aoMGY{+93dx&t!5)VMu4pI8U8T.ULO" }
+        $requestHeaders = @{ "x-api-key"="aoMGY{+93dx&t!5)VMu4pI8U8T.ULO" }
 
-        $jsonResult = Invoke-GraphQLQuery -Mutation $myMutation -Headers $requestHeaders -Uri $url -Raw
+        $jsonResult = Invoke-GraphQLQuery -Mutation $myMutation -Headers $requestHeaders -Uri $uri -Raw
 
         Sends a GraphQL mutation to the endpoint 'https://mytargetserver/v1/graphql' with the results returned as JSON.
     .EXAMPLE
-        $targetHost = "gqlserver01"
-        $gqlEndpointUri = "https://{0}/graphql" -f $targetHost
+        gql -q 'query { users { created_at id last_seen name } }' -u 'https://mytargetserver/v1/graphql' -
 
-        $session = [Microsoft.PowerShell.Commands.WebRequestSession]::new()
-        $cookine = [System.Net.Cookie]::new()
-        $cookie.Name = "env"
-        $cookie.Value = "dCLaUp2JSy2-+R#LSOa#IA7xsD"
-        $cookie.Domain = $targetHost
-        $session.Cookies.Add($cookie)
-
-        Invoke-GraphQLQuery -Query $reconQuery -Uri $gqlEndpointUri -WebSession $session -Raw
-
-        Initiates a GraphQL query with the web request session defined in the $session variable.
+        Sends a GraphQL query to an endpoint with the results returned as JSON (as a one-liner using aliases).
     .LINK
         https://graphql.org/
         Format-Table
     #>
     [CmdletBinding()]
     [Alias("gql")]
-    [OutputType([System.Management.Automation.PSCustomObject],[System.String])]
+    [OutputType([System.Management.Automation.PSCustomObject], [System.String])]
     Param
     (
         [Parameter(Mandatory = $true,
             ValueFromPipelineByPropertyName = $false,
-            Position = 0)][ValidateLength(12, 1073741791)][Alias("Mutation","q","m")][System.String]$Query,
+            Position = 0)][ValidateLength(12, 1073741791)][Alias("Mutation", "q", "m")][System.String]$Query,
 
         [Parameter(Mandatory = $false,
             ValueFromPipelineByPropertyName = $false,
@@ -110,8 +114,8 @@ function Invoke-GraphQLQuery {
             ValueFromPipelineByPropertyName = $false,
             Position = 3)][Microsoft.PowerShell.Commands.WebRequestSession]$WebSession,
 
-        [Parameter(Mandatory = $false,ParameterSetName="JSON",
-            Position = 4)][Alias("AsJson","json","r")][Switch]$Raw
+        [Parameter(Mandatory = $false, ParameterSetName = "JSON",
+            Position = 4)][Alias("AsJson", "json", "r")][Switch]$Raw
     )
     PROCESS {
         [string]$cleanedInput = ($Query -replace '\s+', ' ').Trim()
@@ -129,18 +133,19 @@ function Invoke-GraphQLQuery {
             Write-Error -Exception $_.Exception -ErrorAction Stop
         }
 
-        $params = @{Uri=$Uri
-                    Method="Post"
-                    Body=$jsonRequestBody
-                    ContentType="application/json"
-                    ErrorAction="Stop"}
+        $params = @{Uri = $Uri
+            Method      = "Post"
+            Body        = $jsonRequestBody
+            ContentType = "application/json"
+            ErrorAction = "Stop"
+        }
 
         if ($PSBoundParameters.ContainsKey("Headers")) {
-            $params.Add("Headers",$Headers)
+            $params.Add("Headers", $Headers)
         }
 
         if ($PSBoundParameters.ContainsKey("WebSession")) {
-            $params.Add("WebSession",$WebSession)
+            $params.Add("WebSession", $WebSession)
         }
 
         $response = $null
