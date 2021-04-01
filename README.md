@@ -88,8 +88,9 @@ The solutions below are written in PowerShell exclusively but two of the solutio
 ```powershell
 # GraphQL endpoint for all solutions below:
 $gqlEndpointUri = "https://mygraphqlserver.company.com/graphql"
-```
-
+```  
+  
+  
 ## Denial of Service :: Batch Query Attack
 
 ```powershell
