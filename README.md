@@ -15,7 +15,7 @@ Install-Module -Name PSGraphQL -Repository PSGallery -Scope CurrentUser
 
 ## Examples
 
-### Send a GraphQL introspect query to an endpoint with the results returned as JSON
+### Send a GraphQL introspection query to an endpoint with the results returned as JSON
 
 ```powershell
 $uri = "https://mytargetserver/v1/graphql"
