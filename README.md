@@ -8,10 +8,8 @@ This PowerShell module contains functions that facilitate querying and create, u
 
 ## Installation and Usage
 
-Installing the module.
-
 ```powershell
-# Install module
+# Installing the module:
 Install-Module -Name PSGraphQL -Repository PSGallery -Scope CurrentUser
 ```
 
