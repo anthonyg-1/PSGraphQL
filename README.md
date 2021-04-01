@@ -54,6 +54,12 @@ $requestHeaders = @{ "x-api-key"="aoMGY{+93dx&t!5)VMu4pI8U8T.ULO" }
 $jsonResult = Invoke-GraphQLQuery -Mutation $myMutation -Headers $requestHeaders -Uri $uri -Raw
 ```
 
+### Send a GraphQL query to an endpoint with the results returned as JSON (as a one-liner using aliases)
+
+```powershell
+gql -q 'query { users { created_at id last_seen name } }' -u 'https://mytargetserver/v1/graphql' -r
+```
+
 # Damn Vulnerable GraphQL Application Solutions
 
 The "Damn Vulnerable GraphQL Application" is an intentionally vulnerable implementation of the GraphQL technology that allows a tester to learn and practice GraphQL Security. For more on DVGQL, please see: https://github.com/dolevf/Damn-Vulnerable-GraphQL-Application
