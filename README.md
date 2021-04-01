@@ -15,20 +15,41 @@ Install-Module -Name PSGraphQL -Repository PSGallery -Scope CurrentUser
 
 ## Examples
 
+### Send a GraphQL introspect query to an endpoint with the results returned as JSON
+
+```powershell
+$uri = "https://mytargetserver/v1/graphql"
+
+
+$introspectionQuery = '
+    query allSchemaTypes {
+        __schema {
+            types {
+                name
+                kind
+                description
+            }
+        }
+    }
+'
+
+Invoke-GraphQLQuery -Query $introspectionQuery -Uri $uri -Raw
+```
+
 ### Send a GraphQL query to an endpoint with the results returned as objects
 
 ```powershell
 $uri = "https://mytargetserver/v1/graphql"
 
 $myQuery = '
-query {
-  users {
-    created_at
-    id
-    last_seen
-    name
-  }
-}
+    query {
+        users {
+            created_at
+            id
+            last_seen
+            name
+        }
+    }
 '
 
 Invoke-GraphQLQuery -Query $myQuery -Uri $uri
