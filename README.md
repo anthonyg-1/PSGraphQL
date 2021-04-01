@@ -2,9 +2,9 @@
 This PowerShell module contains functions that facilitate querying and create, update, and delete (mutations) operations for GraphQL endpoints.
 
 ### Tested on
-:desktop_computer: `Windows 10`  
-:penguin: `Linux`  
-:apple: `MacOS`    
+:desktop_computer: `Windows 10`
+:penguin: `Linux`
+:apple: `MacOS`
 
 ## Installation and Usage
 
@@ -401,7 +401,7 @@ Invoke-GraphQLQuery -Query $bypassQuery -Uri $gqlEndpointUri -Headers $headers -
 ```powershell
 $pathTraversalMutation = '
     mutation PathTraversalMutation {
-            uploadPaste(filename:"../../../../../tmp/file.txt", content:"path traversal test"){
+            uploadPaste(filename:"../../../../../tmp/file.txt", content:"path traversal test successful"){
             result
         }
     }
