@@ -116,7 +116,7 @@ function Invoke-GraphQLQuery {
     PROCESS {
         [string]$cleanedInput = ($Query -replace '\s+', ' ').Trim()
 
-        if (($cleanedInput -notlike "query *") -and ($cleanedInput -notlike "mutation *") ) {
+        if (($cleanedInput -notlike "query*") -and ($cleanedInput -notlike "mutation*") ) {
             $ArgumentException = New-Object -TypeName ArgumentException -ArgumentList "Not a valid GraphQL query or mutation. Verify syntax and try again."
             Write-Error -Exception $ArgumentException -ErrorAction Stop
         }
