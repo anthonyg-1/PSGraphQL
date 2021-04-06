@@ -92,6 +92,7 @@ function Invoke-GraphQLQuery {
     .LINK
         https://graphql.org/
         Format-Table
+        https://docs.microsoft.com/en-us/dotnet/api/microsoft.powershell.commands.webrequestsession?view=powershellsdk-7.0.0
     #>
     [CmdletBinding()]
     [Alias("gql")]
@@ -127,7 +128,7 @@ function Invoke-GraphQLQuery {
 
         [string]$jsonRequestBody = ""
         try {
-            $jsonRequestBody = @{query = $cleanedInput } | ConvertTo-Json -Compress -ErrorAction Stop
+            $jsonRequestBody = @{query = $cleanedInput} | ConvertTo-Json -Compress -ErrorAction Stop
         }
         catch {
             Write-Error -Exception $_.Exception -ErrorAction Stop
