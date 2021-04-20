@@ -10,7 +10,7 @@ This PowerShell module contains functions that facilitate querying and create, u
 
 ```powershell
 # Installing the module:
-Install-Module -Name PSGraphQL -Repository PSGallery -Scope CurrentUser -RequiredVersion 1.0.7
+Install-Module -Name PSGraphQL -Repository PSGallery -Scope CurrentUser
 ```
 
 ## Examples
