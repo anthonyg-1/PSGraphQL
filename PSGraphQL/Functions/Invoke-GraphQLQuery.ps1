@@ -37,6 +37,12 @@ function Invoke-GraphQLQuery {
     .EXAMPLE
         $uri = "https://mytargetserver/v1/graphql"
 
+        $results = Invoke-GraphQLQuery -Uri $uri
+
+        Sends a GraphQL introspection query using the default value for the Query parameter (as opposed to specifying it) to the endpoint 'https://mytargetserver/v1/graphql' with the results returned as objects and assigning the results to the $results variable.
+    .EXAMPLE
+        $uri = "https://mytargetserver/v1/graphql"
+
         $myQuery = '
             query GetUsers {
                 users {
@@ -99,9 +105,9 @@ function Invoke-GraphQLQuery {
     [OutputType([System.Management.Automation.PSCustomObject], [System.String])]
     Param
     (
-        [Parameter(Mandatory = $true,
+        [Parameter(Mandatory = $false,
             ValueFromPipelineByPropertyName = $false,
-            Position = 0)][ValidateLength(12, 1073741791)][Alias("Mutation", "q", "m")][System.String]$Query,
+            Position = 0)][ValidateLength(12, 1073741791)][Alias("Mutation", "q", "m")][System.String]$Query = "query introspection { __schema { types { name kind description } } }",
 
         [Parameter(Mandatory = $false,
             ValueFromPipelineByPropertyName = $false,
@@ -128,7 +134,7 @@ function Invoke-GraphQLQuery {
 
         [string]$jsonRequestBody = ""
         try {
-            $jsonRequestBody = @{query = $cleanedInput} | ConvertTo-Json -Compress -ErrorAction Stop
+            $jsonRequestBody = @{query = $cleanedInput } | ConvertTo-Json -Compress -ErrorAction Stop
         }
         catch {
             Write-Error -Exception $_.Exception -ErrorAction Stop
