@@ -73,6 +73,31 @@ $requestHeaders = @{ "x-api-key"="aoMGY{+93dx&t!5)VMu4pI8U8T.ULO" }
 $jsonResult = Invoke-GraphQLQuery -Mutation $myMutation -Headers $requestHeaders -Uri $uri -Raw
 ```
 
+### Send a GraphQL query using JWT for authentication to an endpoint and navigate the results
+
+```powershell
+$jwt = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MjAzOTMwMjgsIm5iZiI6MTYyMDM5MzAyNywiZXhwIjoxNjIwMzkzMzI4LCJzdWIiOiJtZUBjb21wYW55LmNvbSIsImp0aSI6ImMwZTk0ZTY0ODc4ZjRlZDFhZWM3YWYwYzViOWM2ZWI5Iiwicm9sZSI6InVzZXIifQ.HaTXDunEjmyUsHs7daLe-AxEpmq58QqqFziydm7MBic"
+
+$headers = @{Authorization="Bearer $jwt"}
+
+
+$uri = "https://mytargetserver/v1/graphql"
+
+$myQuery = '
+    query GetUsers {
+        users {
+            created_at
+            id
+            last_seen
+            name
+    }
+}
+'
+
+$result = Invoke-GraphQLQuery -Query $myQuery -Headers $headers -Uri $uri
+$result.data.users | Format-Table
+```
+
 ### Send a GraphQL query to an endpoint with the results returned as JSON (as a one-liner using aliases)
 
 ```powershell
