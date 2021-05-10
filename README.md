@@ -1,5 +1,5 @@
 # PSGraphQL
-This PowerShell module contains functions that facilitate query and mutation operations for GraphQL endpoints.
+This PowerShell module contains functions that facilitate query and mutation operations against GraphQL endpoints.
 
 ### Tested on
 :desktop_computer: `Windows 10`
