@@ -157,7 +157,7 @@ function Invoke-GraphQLQuery {
 
         [string]$jsonRequestBody = ""
         try {
-            $jsonRequestBody = @{query = $cleanedInput } | ConvertTo-Json -Compress -ErrorAction Stop
+            $jsonRequestBody = @{ query = $cleanedInput } | ConvertTo-Json -Compress -ErrorAction Stop
         }
         catch {
             Write-Error -Exception $_.Exception -ErrorAction Stop
