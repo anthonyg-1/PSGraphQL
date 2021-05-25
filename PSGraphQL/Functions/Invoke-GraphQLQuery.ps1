@@ -80,7 +80,6 @@ function Invoke-GraphQLQuery {
 
         $headers = @{Authorization="Bearer $jwt"}
 
-
         $uri = "https://mytargetserver/v1/graphql"
 
         $myQuery = '
