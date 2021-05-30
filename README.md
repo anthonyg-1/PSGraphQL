@@ -6,7 +6,7 @@ This PowerShell module contains functions that facilitate query and mutation ope
 :penguin: `Linux`
 :apple: `MacOS`
 
-### Installation and Usage
+### Installation
 
 ```powershell
 # Installing the module
