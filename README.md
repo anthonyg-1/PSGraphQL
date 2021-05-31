@@ -13,6 +13,9 @@ This PowerShell module contains functions that facilitate query and mutation ope
 Install-Module -Name PSGraphQL -Repository PSGallery -Scope CurrentUser
 ```
 
+### Requirements
+Requires PowerShell 5.1 or above.
+
 ## Examples
 
 ### Send a GraphQL introspection query to an endpoint with the results returned as JSON
