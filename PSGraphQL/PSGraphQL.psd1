@@ -13,7 +13,7 @@
 RootModule = '.\PSGraphQL'
 
 # Version number of this module.
-ModuleVersion = '1.0.10'
+ModuleVersion = '1.1.0'
 
 # ID used to uniquely identify this module
 GUID = '06f56284-848d-4070-9636-9c95e7cdf5be'
@@ -40,11 +40,8 @@ PrivateData = @{
 
     PSData = @{
         Tags = @("GraphQL")
-
         LicenseUri = "https://github.com/anthonyg-1/PSGraphQL/blob/main/LICENSE"
-
         ProjectUri = "https://github.com/anthonyg-1/PSGraphQL"
-
     } # End PSData
 
 } # End PrivateData
