@@ -18,7 +18,7 @@ Requires PowerShell 5.1 or above.
 
 ## Examples
 
-### Send a GraphQL query an endpoint with variables
+### Send a GraphQL query an endpoint with operation name and variables
 ```powershell
 
 $uri = "https://mytargetserver/v1/graphql"
@@ -28,9 +28,10 @@ $query = '
         rollDice(numDice: $dice, numSides: $sides)
 }'
 
+$opName = "RollDice"
 $variables = @{dice=3; sides=6}
 
-Invoke-GraphQLQuery -Query $query -Variables $variables -Uri $uri       
+Invoke-GraphQLQuery -Query $query -OperationName $opName -Variables $variables -Uri $uri       
 ```
 
 ### Send a GraphQL introspection query to an endpoint with the results returned as JSON
