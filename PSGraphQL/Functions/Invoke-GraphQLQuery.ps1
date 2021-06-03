@@ -30,7 +30,7 @@ function Invoke-GraphQLQuery {
 
         $variables = @{dice=3; sides=6}
 
-        Invoke-GraphQLQuery -Query $query -Variables $variables -Uri $uri -Raw
+        Invoke-GraphQLQuery -Query $query -Variables $variables -Uri $uri
 
         Sends a GraphQL introspection query to the endpoint 'https://mytargetserver/v1/graphql' with variables defined in $variables.
     .EXAMPLE
