@@ -6,6 +6,10 @@ function Invoke-GraphQLQuery {
         Sends a query (read operation) or mutation (create, update, delete operation) to a GraphQL endpoint.
     .PARAMETER Query
         The GraphQL query or mutation to send to the endpoint.
+    .PARAMETER OperationName
+        A meaningful and explicit name for your GraphQL operation.
+    .PARAMETER Variables
+        Variables expressed as a hash table for your GraphQL operation.
     .PARAMETER Headers
         Specifies the headers of the web request expressed as a hash table.
     .PARAMETER Uri
@@ -14,10 +18,6 @@ function Invoke-GraphQLQuery {
         Specifies a web request session. Enter the variable name, including the dollar sign (`$`).
     .PARAMETER Raw
         Tells the function to return JSON as opposed to objects.
-    .PARAMETER OperationName
-        A meaningful and explicit name for your GraphQL operation.
-    .PARAMETER Variables
-        Variables expressed as a hash table for your GraphQL operation.
     .NOTES
         Query and mutation default return type is a collection of objects. To return results as JSON, use the -Raw switch.
     .EXAMPLE
