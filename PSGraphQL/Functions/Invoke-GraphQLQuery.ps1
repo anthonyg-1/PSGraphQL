@@ -32,7 +32,7 @@ function Invoke-GraphQLQuery {
 
         Invoke-GraphQLQuery -Query $query -Variables $variables -Uri $uri
 
-        Sends a GraphQL introspection query to the endpoint 'https://mytargetserver/v1/graphql' with variables defined in $variables.
+        Sends a GraphQL query to the endpoint 'https://mytargetserver/v1/graphql' with variables defined in $variables.
     .EXAMPLE
         $uri = "https://mytargetserver/v1/graphql"
 
