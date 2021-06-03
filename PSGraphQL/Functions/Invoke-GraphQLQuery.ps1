@@ -14,8 +14,25 @@ function Invoke-GraphQLQuery {
         Specifies a web request session. Enter the variable name, including the dollar sign (`$`).
     .PARAMETER Raw
         Tells the function to return JSON as opposed to objects.
+    .PARAMETER OperationName
+        A meaningful and explicit name for your GraphQL operation.
+    .PARAMETER Variables
+        Variables expressed as a hash table for your GraphQL operation.
     .NOTES
         Query and mutation default return type is a collection of objects. To return results as JSON, use the -Raw switch.
+    .EXAMPLE
+        $uri = "https://mytargetserver/v1/graphql"
+
+        $query = '
+            query RollDice($dice: Int!, $sides: Int) {
+                rollDice(numDice: $dice, numSides: $sides)
+            }'
+
+        $variables = @{dice=3; sides=6}
+
+        Invoke-GraphQLQuery -Query $query -Variables $variables -Uri $uri -Raw
+
+        Sends a GraphQL introspection query to the endpoint 'https://mytargetserver/v1/graphql' with variables defined in $variables.
     .EXAMPLE
         $uri = "https://mytargetserver/v1/graphql"
 
@@ -133,30 +150,63 @@ function Invoke-GraphQLQuery {
 
         [Parameter(Mandatory = $false,
             ValueFromPipelineByPropertyName = $false,
-            Position = 1)][Alias("h")][System.Collections.Hashtable]$Headers,
-
-        [Parameter(Mandatory = $true,
-            ValueFromPipelineByPropertyName = $false,
-            Position = 2)][Alias("u")][System.Uri]$Uri,
+            Position = 1)][ValidateLength(1, 4096)][Alias("op")][System.String]$OperationName,
 
         [Parameter(Mandatory = $false,
             ValueFromPipelineByPropertyName = $false,
-            Position = 3)][Microsoft.PowerShell.Commands.WebRequestSession]$WebSession,
+            Position = 2)][ValidateNotNullOrEmpty()][Alias("v")][System.Collections.Hashtable]$Variables,
+
+        [Parameter(Mandatory = $false,
+            ValueFromPipelineByPropertyName = $false,
+            Position = 3)][Alias("h")][System.Collections.Hashtable]$Headers,
+
+        [Parameter(Mandatory = $true,
+            ValueFromPipelineByPropertyName = $false,
+            Position = 4)][Alias("u")][System.Uri]$Uri,
+
+        [Parameter(Mandatory = $false,
+            ValueFromPipelineByPropertyName = $false,
+            Position = 5)][Microsoft.PowerShell.Commands.WebRequestSession]$WebSession,
 
         [Parameter(Mandatory = $false, ParameterSetName = "JSON",
-            Position = 4)][Alias("AsJson", "json", "r")][Switch]$Raw
-    )
-    PROCESS {
-        [string]$cleanedInput = ($Query -replace '\s+', ' ').Trim()
+            Position = 6)][Alias("AsJson", "json", "r")][Switch]$Raw
 
-        if (($cleanedInput.ToLower() -notlike "query*") -and ($cleanedInput.ToLower() -notlike "mutation*") ) {
+    )
+    BEGIN {
+        function Compress-String([string]$InputString) {
+            return ($InputString -replace '\s+', ' ').Trim()
+        }
+    }
+    PROCESS {
+
+        # The object that will ultimately be serialized and sent to the GraphQL endpoint:
+        $jsonRequestObject = [ordered]@{ }
+
+        # Trim all spaces and flatten $OperationName parameter value and add to $jsonRequestObject:
+        if ($PSBoundParameters.ContainsKey("OperationName")) {
+            $cleanedOperationInput = Compress-String -InputString $OperationName
+            $jsonRequestObject.Add("operationName", $cleanedOperationInput)
+        }
+
+        # Add $Variables hashtable to $jsonRequestObject:
+        if ($PSBoundParameters.ContainsKey("Variables")) {
+            $jsonRequestObject.Add("variables", $Variables)
+        }
+
+        # Trim all spaces and flatten $Query parameter value and add to $jsonRequestObject:
+        $cleanedQueryInput = Compress-String -InputString $Query
+        if (($cleanedQueryInput.ToLower() -notlike "query*") -and ($cleanedQueryInput.ToLower() -notlike "mutation*") ) {
             $ArgumentException = New-Object -TypeName ArgumentException -ArgumentList "Not a valid GraphQL query or mutation. Verify syntax and try again."
             Write-Error -Exception $ArgumentException -ErrorAction Stop
         }
 
+        # Add $Query $jsonRequestObject:
+        $jsonRequestObject.Add("query", $cleanedQueryInput)
+
+        # Serialize $jsonRequestObject:
         [string]$jsonRequestBody = ""
         try {
-            $jsonRequestBody = @{query = $cleanedInput} | ConvertTo-Json -Compress -ErrorAction Stop
+            $jsonRequestBody = $jsonRequestObject | ConvertTo-Json -Compress -ErrorAction Stop
         }
         catch {
             Write-Error -Exception $_.Exception -ErrorAction Stop
