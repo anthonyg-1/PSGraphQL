@@ -18,11 +18,25 @@ Requires PowerShell 5.1 or above.
 
 ## Examples
 
+### Send a GraphQL query an endpoint with variables
+```powershell
+
+$uri = "https://mytargetserver/v1/graphql"
+
+$query = '
+    query RollDice($dice: Int!, $sides: Int) {
+        rollDice(numDice: $dice, numSides: $sides)
+}'
+
+$variables = @{dice=3; sides=6}
+
+Invoke-GraphQLQuery -Query $query -Variables $variables -Uri $uri       
+```
+
 ### Send a GraphQL introspection query to an endpoint with the results returned as JSON
 
 ```powershell
 $uri = "https://mytargetserver/v1/graphql"
-
 
 $introspectionQuery = '
     query allSchemaTypes {
