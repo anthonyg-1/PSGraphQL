@@ -18,7 +18,7 @@ Requires PowerShell 5.1 or above.
 
 ## Examples
 
-### Send a GraphQL query to an endpoint with operation name and variables
+### Send a GraphQL query to an endpoint including operation name and variables
 ```powershell
 
 $uri = "https://mytargetserver/v1/graphql"
