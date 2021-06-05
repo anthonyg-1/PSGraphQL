@@ -9,41 +9,44 @@
 
 @{
 
-# Script module or binary module file associated with this manifest.
-RootModule = '.\PSGraphQL'
+    # Script module or binary module file associated with this manifest.
+    RootModule           = '.\PSGraphQL'
 
-# Version number of this module.
-ModuleVersion = '1.1.2'
+    # Version number of this module.
+    ModuleVersion        = '1.1.3'
 
-# ID used to uniquely identify this module
-GUID = '06f56284-848d-4070-9636-9c95e7cdf5be'
+    # Compatibility
+    CompatiblePSEditions = 'Desktop', 'Core'
 
-# Author of this module
-Author = 'Tony Guimelli'
+    # ID used to uniquely identify this module
+    GUID                 = '06f56284-848d-4070-9636-9c95e7cdf5be'
 
-# Minimum version of the Windows PowerShell engine required by this module
-PowerShellVersion = '5.1'
+    # Author of this module
+    Author               = 'Tony Guimelli'
 
-# Description of the functionality provided by this module
-Description = 'This PowerShell module contains functions that facilitate querying and create, update, and delete (mutations) operations for GraphQL endpoints.'
+    # Minimum version of the Windows PowerShell engine required by this module
+    PowerShellVersion    = '5.1'
 
-# Functions to export from this module
-FunctionsToExport = 'Invoke-GraphQLQuery'
+    # Description of the functionality provided by this module
+    Description          = 'This PowerShell module contains functions that facilitate querying and create, update, and delete (mutations) operations for GraphQL endpoints.'
 
-# Aliases to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no aliases to export.
-AliasesToExport = 'Invoke-GraphQLMutation', 'gql'
+    # Functions to export from this module
+    FunctionsToExport    = 'Invoke-GraphQLQuery'
 
-# List of all files packaged with this module
-FileList = 'PSGraphQL.psd1','PSGraphQL.psm1'
+    # Aliases to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no aliases to export.
+    AliasesToExport      = 'Invoke-GraphQLMutation', 'gql'
 
-PrivateData = @{
+    # List of all files packaged with this module
+    FileList             = 'PSGraphQL.psd1', 'PSGraphQL.psm1'
 
-    PSData = @{
-        Tags = @("GraphQL")
-        LicenseUri = "https://github.com/anthonyg-1/PSGraphQL/blob/main/LICENSE"
-        ProjectUri = "https://github.com/anthonyg-1/PSGraphQL"
-    } # End PSData
+    PrivateData          = @{
 
-} # End PrivateData
+        PSData = @{
+            Tags       = @("GraphQL")
+            LicenseUri = "https://github.com/anthonyg-1/PSGraphQL/blob/main/LICENSE"
+            ProjectUri = "https://github.com/anthonyg-1/PSGraphQL"
+        } # End PSData
+
+    } # End PrivateData
 
 }
