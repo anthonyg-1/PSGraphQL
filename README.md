@@ -86,7 +86,7 @@ $myMutation = '
 }
 '
 
-$requestHeaders = @{ "x-api-key"="aoMGY{+93dx&t!5)VMu4pI8U8T.ULO" }
+$requestHeaders = @{ "x-api-key"='aoMGY{+93dx&t!5)VMu4pI8U8T.ULO' }
 
 $jsonResult = Invoke-GraphQLQuery -Mutation $myMutation -Headers $requestHeaders -Uri $uri -Raw
 ```
