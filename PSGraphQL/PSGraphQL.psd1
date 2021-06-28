@@ -13,7 +13,7 @@
     RootModule           = '.\PSGraphQL'
 
     # Version number of this module.
-    ModuleVersion        = '1.1.4'
+    ModuleVersion        = '1.1.5'
 
     # Compatibility
     CompatiblePSEditions = 'Desktop', 'Core'
@@ -29,9 +29,6 @@
 
     # Description of the functionality provided by this module
     Description          = 'This PowerShell module contains functions that facilitate querying and create, update, and delete (mutations) operations for GraphQL endpoints.'
-
-    # Modules that must be imported into the global environment prior to importing this module
-    RequiredModules      = @('Microsoft.PowerShell.Utility')
 
     # Functions to export from this module
     FunctionsToExport    = 'Invoke-GraphQLQuery'
