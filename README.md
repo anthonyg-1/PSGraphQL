@@ -126,7 +126,7 @@ gql -q 'query { users { created_at id last_seen name } }' -u 'https://mytargetse
 
 The "Damn Vulnerable GraphQL Application" is an intentionally vulnerable implementation of the GraphQL technology that allows a tester to learn and practice GraphQL security. For more on DVGQL, please see: https://github.com/dolevf/Damn-Vulnerable-GraphQL-Application
 
-The solutions below are written in PowerShell exclusively but two of the solutions required Invoke-WebRequest as opposed to this modules Invoke-GraphQLQuery.
+The solutions below are written in PowerShell exclusively but one of the solutions required Invoke-WebRequest as opposed to this modules Invoke-GraphQLQuery.
 
 ```powershell
 # GraphQL endpoint for all solutions below:
