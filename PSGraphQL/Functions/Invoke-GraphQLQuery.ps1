@@ -206,7 +206,7 @@ function Invoke-GraphQLQuery {
         # Serialize $jsonRequestObject:
         [string]$jsonRequestBody = ""
         try {
-            $jsonRequestBody = $jsonRequestObject | ConvertTo-Json -Compress -ErrorAction Stop
+            $jsonRequestBody = $jsonRequestObject | ConvertTo-Json -Depth 4 -Compress -ErrorAction Stop
         }
         catch {
             Write-Error -Exception $_.Exception -ErrorAction Stop
