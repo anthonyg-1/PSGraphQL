@@ -98,7 +98,6 @@ $jwt = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MjAzOTMwMjgsIm5iZiI6MTY
 
 $headers = @{Authorization="Bearer $jwt"}
 
-
 $uri = "https://mytargetserver/v1/graphql"
 
 $myQuery = '
