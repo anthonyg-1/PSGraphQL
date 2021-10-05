@@ -9,7 +9,7 @@ function Invoke-GraphQLQuery {
     .PARAMETER OperationName
         A meaningful and explicit name for your GraphQL operation.
     .PARAMETER Variables
-        Variables expressed as a hash table for your GraphQL operation.
+        Variables expressed as a hash table or JSON string for your GraphQL operation.
     .PARAMETER Headers
         Specifies the headers of the web request expressed as a hash table.
     .PARAMETER Uri
@@ -27,6 +27,23 @@ function Invoke-GraphQLQuery {
             query RollDice($dice: Int!, $sides: Int) {
                 rollDice(numDice: $dice, numSides: $sides)
             }'
+
+        $variables = '
+            {
+                "dice": 3,
+                "sides": 6
+            }'
+
+        Invoke-GraphQLQuery -Query $query -Variables $variables -Uri $uri
+
+        Sends a GraphQL query to the endpoint 'https://mytargetserver/v1/graphql' with variables defined in $variables as JSON.
+    .EXAMPLE
+        $uri = "https://mytargetserver/v1/graphql"
+
+        $query = '
+        query RollDice($dice: Int!, $sides: Int) {
+            rollDice(numDice: $dice, numSides: $sides)
+        }'
 
         $variables = @{dice=3; sides=6}
 
@@ -154,7 +171,7 @@ function Invoke-GraphQLQuery {
 
         [Parameter(Mandatory = $false,
             ValueFromPipelineByPropertyName = $false,
-            Position = 2)][ValidateNotNullOrEmpty()][Alias("v")][System.Collections.Hashtable]$Variables,
+            Position = 2)][ValidateNotNullOrEmpty()][Alias("v")][Object]$Variables,
 
         [Parameter(Mandatory = $false,
             ValueFromPipelineByPropertyName = $false,
@@ -188,9 +205,39 @@ function Invoke-GraphQLQuery {
             $jsonRequestObject.Add("operationName", $cleanedOperationInput)
         }
 
-        # Add $Variables hashtable to $jsonRequestObject:
+        # Determine if $Variables is JSON or a HashTable and add to $jsonRequestObject:
         if ($PSBoundParameters.ContainsKey("Variables")) {
-            $jsonRequestObject.Add("variables", $Variables)
+            $ArgumentException = New-Object -TypeName System.ArgumentException -ArgumentList "Unable to parse incoming GraphQL variables. Please ensure that passed values are either valid JSON or of type System.Collections.HashTable."
+
+            if ($Variables.GetType().Name -eq "Hashtable") {
+                $jsonRequestObject.Add("variables", $Variables)
+            }
+            elseif ($Variables.GetType().Name -eq "String") {
+                $variableTable = @{ }
+
+                [bool]$isValidJson = $false
+                try {
+                    $deserializedVariables = $Variables | ConvertFrom-Json -ErrorAction Stop
+
+                    $deserializedVariables.PSObject.Properties | ForEach-Object {
+                        $variableTable.Add($_.Name, $_.Value)
+                    }
+
+                    $jsonRequestObject.Add("variables", $variableTable)
+
+                    $isValidJson = $true
+                }
+                catch {
+                    $isValidJson = $false
+                }
+
+                if (-not($isValidJson)) {
+                    Write-Error -Exception $ArgumentException -ErrorAction Stop
+                }
+            }
+            else {
+                Write-Error -Exception $ArgumentException -ErrorAction Stop
+            }
         }
 
         # Trim all spaces and flatten $Query parameter value and add to $jsonRequestObject:
