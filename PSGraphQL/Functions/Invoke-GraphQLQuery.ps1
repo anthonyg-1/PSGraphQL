@@ -232,11 +232,11 @@ function Invoke-GraphQLQuery {
                 }
 
                 if (-not($isValidJson)) {
-                    Write-Error -Exception $ArgumentException -ErrorAction Stop
+                    Write-Error -Exception $ArgumentException -Category InvalidArgument -ErrorAction Stop
                 }
             }
             else {
-                Write-Error -Exception $ArgumentException -ErrorAction Stop
+                Write-Error -Exception $ArgumentException -Category InvalidArgument -ErrorAction Stop
             }
         }
 
@@ -244,7 +244,7 @@ function Invoke-GraphQLQuery {
         $cleanedQueryInput = Compress-String -InputString $Query
         if (($cleanedQueryInput.ToLower() -notlike "query*") -and ($cleanedQueryInput.ToLower() -notlike "mutation*") ) {
             $ArgumentException = New-Object -TypeName ArgumentException -ArgumentList "Not a valid GraphQL query or mutation. Verify syntax and try again."
-            Write-Error -Exception $ArgumentException -ErrorAction Stop
+            Write-Error -Exception $ArgumentException -Category InvalidArgument -ErrorAction Stop
         }
 
         # Add $Query $jsonRequestObject:
@@ -253,10 +253,10 @@ function Invoke-GraphQLQuery {
         # Serialize $jsonRequestObject:
         [string]$jsonRequestBody = ""
         try {
-            $jsonRequestBody = $jsonRequestObject | ConvertTo-Json -Depth 4 -Compress -ErrorAction Stop
+            $jsonRequestBody = $jsonRequestObject | ConvertTo-Json -Depth 25 -Compress -ErrorAction Stop
         }
         catch {
-            Write-Error -Exception $_.Exception -ErrorAction Stop
+            Write-Error -Exception $_.Exception -Category InvalidResult -ErrorAction Stop
         }
 
         $params = @{Uri = $Uri
@@ -279,7 +279,7 @@ function Invoke-GraphQLQuery {
             $response = Invoke-RestMethod @params
         }
         catch {
-            Write-Error -Exception $_.Exception -ErrorAction Stop
+            Write-Error -Exception $_.Exception -Category InvalidOperation -ErrorAction Stop
         }
 
         if ($PSBoundParameters.ContainsKey("Raw")) {
@@ -287,7 +287,7 @@ function Invoke-GraphQLQuery {
                 return $($response | ConvertTo-Json -Depth 100 -ErrorAction Stop)
             }
             catch {
-                Write-Error -Exception $_.Exception -ErrorAction Stop
+                Write-Error -Exception $_.Exception -Category InvalidResult -ErrorAction Stop
             }
         }
         else {
@@ -295,7 +295,7 @@ function Invoke-GraphQLQuery {
                 return $response
             }
             catch {
-                Write-Error -Exception $_.Exception -ErrorAction Stop
+                Write-Error -Exception $_.Exception -Category InvalidResult -ErrorAction Stop
             }
         }
     }
