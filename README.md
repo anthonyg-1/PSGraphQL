@@ -18,7 +18,7 @@ Requires PowerShell 5.1 or above.
 
 ## Examples
 
-### Send a GraphQL query to an endpoint including operation name and variables
+### Send a GraphQL query to an endpoint including operation name and variables as a HashTable
 ```powershell
 
 $uri = "https://mytargetserver/v1/graphql"
@@ -30,6 +30,27 @@ $query = '
 
 $opName = "RollDice"
 $variables = @{dice=3; sides=6}
+
+Invoke-GraphQLQuery -Query $query -OperationName $opName -Variables $variables -Uri $uri       
+```
+
+### Send a GraphQL query to an endpoint including operation name and variables as JSON
+```powershell
+
+$uri = "https://mytargetserver/v1/graphql"
+
+$query = '
+    query RollDice($dice: Int!, $sides: Int) {
+        rollDice(numDice: $dice, numSides: $sides)
+}'
+
+$opName = "RollDice"
+
+$variables = '
+    {
+        "dice": 3,
+        "sides": 6
+    }'
 
 Invoke-GraphQLQuery -Query $query -OperationName $opName -Variables $variables -Uri $uri       
 ```
