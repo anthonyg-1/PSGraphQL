@@ -253,7 +253,7 @@ function Invoke-GraphQLQuery {
         # Serialize $jsonRequestObject:
         [string]$jsonRequestBody = ""
         try {
-            $jsonRequestBody = $jsonRequestObject | ConvertTo-Json -Depth 100 -Compress -ErrorAction Stop
+            $jsonRequestBody = $jsonRequestObject | ConvertTo-Json -Depth 100 -Compress -ErrorAction Stop -WarningAction SilentlyContinue
         }
         catch {
             Write-Error -Exception $_.Exception -Category InvalidResult -ErrorAction Stop
@@ -284,7 +284,7 @@ function Invoke-GraphQLQuery {
 
         if ($PSBoundParameters.ContainsKey("Raw")) {
             try {
-                return $($response | ConvertTo-Json -Depth 100 -ErrorAction Stop)
+                return $($response | ConvertTo-Json -Depth 100 -ErrorAction Stop -WarningAction SilentlyContinue)
             }
             catch {
                 Write-Error -Exception $_.Exception -Category InvalidResult -ErrorAction Stop
