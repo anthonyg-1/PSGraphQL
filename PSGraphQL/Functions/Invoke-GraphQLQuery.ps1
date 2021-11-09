@@ -12,6 +12,8 @@ function Invoke-GraphQLQuery {
         Variables expressed as a hash table or JSON string for your GraphQL operation.
     .PARAMETER Headers
         Specifies the headers of the web request expressed as a hash table.
+    .PARAMETER Method
+        Specifies the method used for the web request. The acceptable values for this parameter are: Post, Put, Patch. Default value is Post.
     .PARAMETER Uri
         Specifies the Uniform Resource Identifier (URI) of the GraphQL endpoint to which the GraphQL query or mutation is sent.
     .PARAMETER WebSession
@@ -177,16 +179,20 @@ function Invoke-GraphQLQuery {
             ValueFromPipelineByPropertyName = $false,
             Position = 3)][Alias("h")][System.Collections.Hashtable]$Headers,
 
+        [Parameter(Mandatory = $false,
+            ValueFromPipelineByPropertyName = $false,
+            Position = 4)][ValidateSet('Post', 'Patch', 'Put')][System.String]$Method = "Post",
+
         [Parameter(Mandatory = $true,
             ValueFromPipelineByPropertyName = $false,
-            Position = 4)][Alias("u")][System.Uri]$Uri,
+            Position = 5)][Alias("u")][System.Uri]$Uri,
 
         [Parameter(Mandatory = $false,
             ValueFromPipelineByPropertyName = $false,
-            Position = 5)][Microsoft.PowerShell.Commands.WebRequestSession]$WebSession,
+            Position = 6)][Microsoft.PowerShell.Commands.WebRequestSession]$WebSession,
 
         [Parameter(Mandatory = $false, ParameterSetName = "JSON",
-            Position = 6)][Alias("AsJson", "json", "r")][Switch]$Raw
+            Position = 7)][Alias("AsJson", "json", "r")][Switch]$Raw
 
     )
     BEGIN {
@@ -260,7 +266,7 @@ function Invoke-GraphQLQuery {
         }
 
         $params = @{Uri = $Uri
-            Method      = "Post"
+            Method      = $Method
             Body        = $jsonRequestBody
             ContentType = "application/json"
             ErrorAction = "Stop"
