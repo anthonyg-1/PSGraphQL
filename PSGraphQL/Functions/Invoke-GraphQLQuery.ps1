@@ -13,7 +13,7 @@ function Invoke-GraphQLQuery {
     .PARAMETER Headers
         Specifies the headers of the web request expressed as a hash table.
     .PARAMETER Method
-        Specifies the method used for the web request. The acceptable values for this parameter are: Post, Put, Patch. Default value is Post.
+        Specifies the method used for the web request. The acceptable values for this parameter are: Post and Get. Default value is Post.
     .PARAMETER Uri
         Specifies the Uniform Resource Identifier (URI) of the GraphQL endpoint to which the GraphQL query or mutation is sent.
     .PARAMETER WebSession
@@ -181,7 +181,7 @@ function Invoke-GraphQLQuery {
 
         [Parameter(Mandatory = $false,
             ValueFromPipelineByPropertyName = $false,
-            Position = 4)][ValidateSet('Post', 'Patch', 'Put')][System.String]$Method = "Post",
+            Position = 4)][ValidateSet('Post', 'Get')][System.String]$Method = "Post",
 
         [Parameter(Mandatory = $true,
             ValueFromPipelineByPropertyName = $false,
