@@ -159,7 +159,7 @@ function Invoke-GraphQLQuery {
     #>
     [CmdletBinding()]
     [Alias("gql")]
-    [OutputType([System.Management.Automation.PSCustomObject], [System.String])]
+    [OutputType([System.Management.Automation.PSCustomObject], [System.String], [GraphQLResponseObject])]
     Param
     (
         [Parameter(Mandatory = $false,
@@ -192,6 +192,7 @@ function Invoke-GraphQLQuery {
 
     )
     BEGIN {
+        # Function to compress GraphQL query string before sending to endpoint:
         function Compress-String([string]$InputString) {
             return ($InputString -replace '\s+', ' ').Trim()
         }
