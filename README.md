@@ -24,7 +24,7 @@ Requires PowerShell 5.1 or above.
 $uri = "https://mytargetserver/v1/graphql"
 
 $query = '
-    query RollDice($dice: Int!, $sides: Int) {
+    query RollDice($dice: Int!, $sides: Int!) {
         rollDice(numDice: $dice, numSides: $sides)
 }'
 
@@ -45,7 +45,7 @@ Invoke-GraphQLQuery -Query $query -OperationName $opName -Variables $variables -
 $uri = "https://mytargetserver/v1/graphql"
 
 $query = '
-    query RollDice($dice: Int!, $sides: Int) {
+    query RollDice($dice: Int!, $sides: Int!) {
         rollDice(numDice: $dice, numSides: $sides)
 }'
 
