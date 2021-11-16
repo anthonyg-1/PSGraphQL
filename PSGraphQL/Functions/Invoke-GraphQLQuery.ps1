@@ -158,13 +158,13 @@ function Invoke-GraphQLQuery {
         Format-Table
     #>
     [CmdletBinding()]
-    [Alias("gql")]
+    [Alias("gql", "Invoke-GraphQLMutation", "Invoke-GraphQLOperation")]
     [OutputType([System.Management.Automation.PSCustomObject], [System.String], [GraphQLResponseObject])]
     Param
     (
         [Parameter(Mandatory = $false,
             ValueFromPipelineByPropertyName = $false,
-            Position = 0)][ValidateLength(12, 1073741791)][Alias("Mutation", "q", "m")][System.String]$Query = "query introspection { __schema { types { name kind description } } }",
+            Position = 0)][ValidateLength(12, 1073741791)][Alias("Mutation", "Operation", "q", "m", "o")][System.String]$Query = "query introspection { __schema { types { name kind description } } }",
 
         [Parameter(Mandatory = $false,
             ValueFromPipelineByPropertyName = $false,
@@ -172,7 +172,7 @@ function Invoke-GraphQLQuery {
 
         [Parameter(Mandatory = $false,
             ValueFromPipelineByPropertyName = $false,
-            Position = 2)][ValidateNotNullOrEmpty()][Alias("v")][Object]$Variables,
+            Position = 2)][ValidateNotNullOrEmpty()][Alias("v", "Arguments")][Object]$Variables,
 
         [Parameter(Mandatory = $false,
             ValueFromPipelineByPropertyName = $false,
@@ -192,11 +192,6 @@ function Invoke-GraphQLQuery {
 
     )
     BEGIN {
-        # Function to compress GraphQL query string before sending to endpoint:
-        function Compress-String([string]$InputString) {
-            return ($InputString -replace '\s+', ' ').Trim()
-        }
-
         # Return type when using the -Detailed switch:
         class GraphQLResponseObject {
             [Int]$StatusCode = 0
@@ -205,10 +200,10 @@ function Invoke-GraphQLQuery {
             [PSObject]$ParsedResponse = $null
             [String]$RawResponse = ""
             [HashTable]$ResponseHeaders = @{ }
+            [TimeSpan]$ExecutionTime
         }
     }
     PROCESS {
-
         # The object that will ultimately be serialized and sent to the GraphQL endpoint:
         $jsonRequestObject = [ordered]@{ }
 
@@ -228,7 +223,6 @@ function Invoke-GraphQLQuery {
             elseif ($Variables.GetType().Name -eq "String") {
                 $variableTable = @{ }
 
-                [bool]$isValidJson = $false
                 try {
                     $deserializedVariables = $Variables | ConvertFrom-Json -ErrorAction Stop
 
@@ -237,14 +231,8 @@ function Invoke-GraphQLQuery {
                     }
 
                     $jsonRequestObject.Add("variables", $variableTable)
-
-                    $isValidJson = $true
                 }
                 catch {
-                    $isValidJson = $false
-                }
-
-                if (-not($isValidJson)) {
                     Write-Error -Exception $ArgumentException -Category InvalidArgument -ErrorAction Stop
                 }
             }
@@ -291,7 +279,15 @@ function Invoke-GraphQLQuery {
 
         if ($PSBoundParameters.ContainsKey("Detailed")) {
             try {
+
+                # Capture the start time:
+                $startDateTime = Get-Date
+
+                # Execute the GraphQL operation:
                 $response = Invoke-WebRequest @params
+
+                # Capture the end time in order to obtain the delta for the ExecutionTime property:
+                $endDateTime = Get-Date
 
                 $gqlResponse = [GraphQLResponseObject]::new()
                 $gqlResponse.StatusCode = $response.StatusCode
@@ -299,6 +295,7 @@ function Invoke-GraphQLQuery {
                 $gqlResponse.Response = $response.Content
                 $gqlResponse.ParsedResponse = $($response.Content | ConvertFrom-Json -ErrorAction Stop -WarningAction SilentlyContinue)
                 $gqlResponse.RawResponse = $response.RawContent
+                $gqlResponse.ExecutionTime = ($endDateTime - $startDateTime)
 
                 # Populate ResponseHeaders property:
                 [HashTable]$responseHeaders = @{ }
