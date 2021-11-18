@@ -16,6 +16,17 @@ function Get-GraphQLVariableList {
 
         Gets a list of variable definitions from a GraphQL query and renders the results to the console as a table.
     .EXAMPLE
+        $mutation = '
+            mutation AddNewPet ($name: String!, $petType: PetType, $petLocation: String!, $petId: Int!) {
+                addPet(name: $name, petType: $petType, location: $petLocation, id: $petId) {
+                    name
+                    petType
+                    location
+                    id
+                }
+            }
+            '
+
         $wordListPath = ".\SQL.txt"
         $words = [IO.File]::ReadAllLines($wordListPath)
 
