@@ -156,6 +156,7 @@ function Invoke-GraphQLQuery {
     .LINK
         https://graphql.org/
         Format-Table
+        Get-GraphQLVariableList
     #>
     [CmdletBinding()]
     [Alias("gql", "Invoke-GraphQLMutation", "Invoke-GraphQLOperation")]
