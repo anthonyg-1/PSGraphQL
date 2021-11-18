@@ -13,7 +13,7 @@
     RootModule           = '.\PSGraphQL'
 
     # Version number of this module.
-    ModuleVersion        = '1.2.2'
+    ModuleVersion        = '1.3.0'
 
     # Compatibility
     CompatiblePSEditions = 'Desktop', 'Core'
@@ -31,10 +31,10 @@
     Description          = 'This PowerShell module contains functions that facilitate querying and create, update, and delete (mutations) operations for GraphQL endpoints.'
 
     # Functions to export from this module
-    FunctionsToExport    = 'Invoke-GraphQLQuery'
+    FunctionsToExport    = 'Invoke-GraphQLQuery', 'Get-GraphQLVariableList'
 
     # Aliases to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no aliases to export.
-    AliasesToExport      = 'Invoke-GraphQLMutation', 'gql'
+    AliasesToExport      = 'Invoke-GraphQLMutation', 'Invoke-GraphQLOperation', 'gql', 'ggqlvl'
 
     # List of all files packaged with this module
     FileList             = 'PSGraphQL.psd1', 'PSGraphQL.psm1'
