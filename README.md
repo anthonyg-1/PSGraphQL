@@ -154,6 +154,16 @@ Get-GraphQLVariableList -Query $query
 
 ### Perform parameter fuzzing against a GraphQL endpoint based on discovered parameters (security testing)
 ```powershell
+$mutation = '
+    mutation AddNewPet ($name: String!, $petType: PetType, $petLocation: String!, $petId: Int!) {
+        addPet(name: $name, petType: $petType, location: $petLocation, id: $petId) {
+            name
+            petType
+            location
+            id
+        }
+    }'
+
 $wordListPath = ".\SQL.txt"
 $words = [IO.File]::ReadAllLines($wordListPath)
 
