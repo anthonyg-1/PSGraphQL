@@ -104,6 +104,15 @@ Describe "Testing module and cmdlets against PSSA rules" -Tag Linting -WarningAc
 }
 
 Describe "Unit Tests for GraphQLVariableList" -Tag Unit {
+    $zeroParamQuery = 'query HeroNameAndFriends {
+        hero {
+          name
+          friends {
+            name
+          }
+        }
+      }'
+
     $twoParamQuery = '
         query GetUsersByUserIdAndCustRecNumber($userId: Int!, $customerRecNum: String!) {
         users: active_users(
@@ -251,8 +260,15 @@ Describe "Unit Tests for GraphQLVariableList" -Tag Unit {
         }
         }'
 
+    Context "Zero variable query" {
+        It "should discover zero variables" {
+            (GraphQLVariableList -Query $zeroParamQuery).HasVariables | Select -First 1 | Should Be False
+        }
+    }
+
     Context "Two variable query" {
         It "should discover two variables" {
+            (GraphQLVariableList -Query $twoParamQuery).HasVariables | Select -First 1 | Should Be True
             (GraphQLVariableList -Query $twoParamQuery | Measure).Count | Should Be 2
         }
 
@@ -275,6 +291,7 @@ Describe "Unit Tests for GraphQLVariableList" -Tag Unit {
 
     Context "Three variable mutation" {
         It "should discover three variables" {
+            (GraphQLVariableList -Query $threeParamMutation).HasVariables | Select -First 1 | Should Be True
             (GraphQLVariableList -Query $threeParamMutation | Measure).Count | Should Be 3
         }
 
@@ -297,6 +314,7 @@ Describe "Unit Tests for GraphQLVariableList" -Tag Unit {
 
     Context "Eight variable mutation" {
         It "should discover eight variables" {
+            (GraphQLVariableList -Query $eightParamMutation).HasVariables | Select -First 1 | Should Be True
             (GraphQLVariableList -Query $eightParamMutation | Measure).Count | Should Be 8
         }
 
