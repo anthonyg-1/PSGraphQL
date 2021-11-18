@@ -142,6 +142,35 @@ $result.data.users | Format-Table
 gql -q 'query { users { created_at id last_seen name } }' -u 'https://mytargetserver/v1/graphql' -r
 ```
 
+### Get a list of variable definitions from a GraphQL query
+```powershell
+$query = '
+    query RollDice($dice: Int!, $sides: Int) {
+        rollDice(numDice: $dice, numSides: $sides)
+}'
+
+Get-GraphQLVariableList -Query $query
+```
+
+### Perform parameter fuzzing against a GraphQL endpoint based on discovered parameters (security testing)
+```powershell
+$wordListPath = ".\SQL.txt"
+$words = [IO.File]::ReadAllLines($wordListPath)
+
+$uri = "https://mytargetserver/v1/graphql"
+
+Get-GraphQLVariableList -Query $mutation | Where Type -eq "String" | ForEach-Object {
+    $varName = $_.Parameter
+    $opName = $_.Operation
+
+    $words | ForEach-Object {
+        $gqlVars = @{$varName=$_}
+
+        Invoke-GraphQLQuery -Uri $uri -Mutation $mutation -OperationName $opName -Variables $gqlVars
+    }
+}
+```
+
 # Damn Vulnerable GraphQL Application Solutions
 
 The "Damn Vulnerable GraphQL Application" is an intentionally vulnerable implementation of the GraphQL technology that allows a tester to learn and practice GraphQL security. For more on DVGQL, please see: https://github.com/dolevf/Damn-Vulnerable-GraphQL-Application
