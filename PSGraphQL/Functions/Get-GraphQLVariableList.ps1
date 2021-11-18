@@ -35,6 +35,10 @@ function Get-GraphQLVariableList {
         Read in a SQL injection word list, iterate through the results of the variable list, filter on type String, then iterate through the SQL injection word list to attempt SQL injection via fuzzing against each discovered parameter.
     .INPUTS
         System.String
+    .LINK
+        https://graphql.org/
+        Format-Table
+        Invoke-GraphQLQuery
     #>
     [CmdletBinding()]
     [Alias('ggqlvl')]
