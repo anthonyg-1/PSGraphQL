@@ -156,7 +156,7 @@ Get-GraphQLVariableList -Query $query
 ```powershell
 $mutation = '
     mutation AddNewPet ($name: String!, $petType: PetType, $petLocation: String!, $petId: Int!) {
-        addPet(name: $name, petType: $petType, location: $petLocation, id: $petId) {
+            addPet(name: $name, petType: $petType, location: $petLocation, id: $petId) {
             name
             petType
             location
@@ -169,15 +169,36 @@ $words = [IO.File]::ReadAllLines($wordListPath)
 
 $uri = "https://mytargetserver/v1/graphql"
 
-Get-GraphQLVariableList -Query $mutation | Where Type -eq "String" | ForEach-Object {
-    $varName = $_.Parameter
-    $opName = $_.Operation
+# Array to store results in from Invoke-GraphQLQuery -Detailed for later analysis:
+$results = @()
 
-    $words | ForEach-Object {
-        $gqlVars = @{$varName=$_}
+# Get the variable definition from the supplied mutation:
+$variableList = $query | Get-GraphQLVariableList
 
-        Invoke-GraphQLQuery -Uri $uri -Mutation $mutation -OperationName $opName -Variables $gqlVars
+$words | ForEach-Object {
+$queryVarTable = @{}
+$word = $_
+
+$variableList | Select Parameter, Type | ForEach-Object {
+    $randomInt = Get-Random
+        $inputParamValue = $null
+        if ($_.Type -eq "Int") {
+            if (-not($queryVarTable.ContainsKey($_.Parameter))) {
+                $queryVarTable.Add($_.Parameter, $randomInt)
+                $inputParamValue = $randomInt
+            }
+        }
+        else {
+        if (-not($queryVarTable.ContainsKey($_.Parameter))) {
+                $queryVarTable.Add($_.Parameter, $word)
+                $inputParamValue = $word
+            }
+        }
     }
+
+    $gqlResult = Invoke-GraphQLQuery -Mutation $mutation -Variables $queryVarTable -Headers $headers -Uri $uri -Detailed
+    $result = [PSCustomObject]@{ParamValues=($queryVarTable);Result=($gqlResult)}
+    $results += $result
 }
 ```
 
