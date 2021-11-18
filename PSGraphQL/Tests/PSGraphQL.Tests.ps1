@@ -12,7 +12,7 @@ $moduleDirectory = Get-Item -Path $myDefaultDirectory | Select-Object -ExpandPro
 
 Clear-Host
 
-Describe "$module Module Structure and Validation Tests" -Tag Unit -WarningAction SilentlyContinue {
+Describe "$module Module Structure and Validation Tests" -Tag Linting -WarningAction SilentlyContinue {
     Context "$module" {
         It "has the root module $module.psm1" {
             "$moduleDirectory/$module.psm1" | Should -Exist
@@ -54,7 +54,7 @@ Describe "$module Module Structure and Validation Tests" -Tag Unit -WarningActio
 
 }
 
-Describe "Testing module and cmdlets against PSSA rules" -Tag Unit -WarningAction SilentlyContinue {
+Describe "Testing module and cmdlets against PSSA rules" -Tag Linting -WarningAction SilentlyContinue {
     $scriptAnalyzerRules = Get-ScriptAnalyzerRule
 
     Context "$module test against PSSA rules" {
@@ -103,7 +103,7 @@ Describe "Testing module and cmdlets against PSSA rules" -Tag Unit -WarningActio
     }
 }
 
-Describe "Unit Tests for GraphQLVariableList" {
+Describe "Unit Tests for GraphQLVariableList" -Tag Unit {
     $twoParamQuery = '
         query GetUsersByUserIdAndCustRecNumber($userId: Int!, $customerRecNum: String!) {
         users: active_users(
@@ -215,6 +215,7 @@ Describe "Unit Tests for GraphQLVariableList" {
         }'
 
     $sevenParamMutationMultiLine = '
+
         mutation UpdateUserTransactional(
             $uuId: uuid!,
             $userId: String!,
@@ -255,6 +256,14 @@ Describe "Unit Tests for GraphQLVariableList" {
             (GraphQLVariableList -Query $twoParamQuery | Measure).Count | Should Be 2
         }
 
+        It "should have an operation name of GetUsersByUserIdAndCustRecNumber" {
+            (GraphQLVariableList -Query $twoParamQuery).Operation | Select -First 1 | Should Be "GetUsersByUserIdAndCustRecNumber"
+        }
+
+        It "should have an operation type of query" {
+            (GraphQLVariableList -Query $twoParamQuery).OperationType | Select -First 1 | Should Be "query"
+        }
+
         It "should contain the variable userId" {
             (GraphQLVariableList -Query $twoParamQuery).Parameter | Should Contain "userId"
         }
@@ -267,6 +276,10 @@ Describe "Unit Tests for GraphQLVariableList" {
     Context "Three variable mutation" {
         It "should discover three variables" {
             (GraphQLVariableList -Query $threeParamMutation | Measure).Count | Should Be 3
+        }
+
+        It "should have an operation type of mutation" {
+            (GraphQLVariableList -Query $threeParamMutation).OperationType | Select -First 1 | Should Be "mutation"
         }
 
         It "should contain the variable firstName" {
@@ -285,6 +298,14 @@ Describe "Unit Tests for GraphQLVariableList" {
     Context "Eight variable mutation" {
         It "should discover eight variables" {
             (GraphQLVariableList -Query $eightParamMutation | Measure).Count | Should Be 8
+        }
+
+        It "should have an operation name of UpdateUserAttributes" {
+            (GraphQLVariableList -Query $eightParamMutation).Operation | Select -First 1 | Should Be "UpdateUserAttributes"
+        }
+
+        It "should have an operation type of mutation" {
+            (GraphQLVariableList -Query $eightParamMutation).OperationType | Select -First 1 | Should Be "mutation"
         }
 
         It "should contain the variable uuid" {
@@ -319,6 +340,14 @@ Describe "Unit Tests for GraphQLVariableList" {
     Context "Nine variable mutation" {
         It "should discover nine variables" {
             (GraphQLVariableList -Query $nineParamMutation | Measure).Count | Should Be 9
+        }
+
+        It "should have an operation name of UpdateUserAttributes" {
+            (GraphQLVariableList -Query $eightParamMutation).Operation | Select -First 1 | Should Be "UpdateUserAttributes"
+        }
+
+        It "should have an operation type of mutation" {
+            (GraphQLVariableList -Query $nineParamMutation).OperationType | Select -First 1 | Should Be "mutation"
         }
 
         It "should contain the variable uuid" {
@@ -359,6 +388,10 @@ Describe "Unit Tests for GraphQLVariableList" {
             (GraphQLVariableList -Query $sevenParamMutation | Measure).Count | Should Be 7
         }
 
+        It "should have an operation type of mutation" {
+            (GraphQLVariableList -Query $sevenParamMutation).OperationType | Select -First 1 | Should Be "mutation"
+        }
+
         It "should contain the variable uuid" {
             (GraphQLVariableList -Query $sevenParamMutation).Parameter | Should Contain "uuid"
         }
@@ -392,6 +425,14 @@ Describe "Unit Tests for GraphQLVariableList" {
     Context "Seven variable mutation multi-line" {
         It "should discover seven variables" {
             (GraphQLVariableList -Query $sevenParamMutationMultiLine | Measure).Count | Should Be 7
+        }
+
+        It "should have an operation name of UpdateUserTransactional" {
+            (GraphQLVariableList -Query $sevenParamMutationMultiLine).Operation | Select -First 1 | Should Be "UpdateUserTransactional"
+        }
+
+        It "should have an operation type of mutation" {
+            (GraphQLVariableList -Query $sevenParamMutationMultiLine).OperationType | Select -First 1 | Should Be "mutation"
         }
 
         It "should contain the variable uuid" {
