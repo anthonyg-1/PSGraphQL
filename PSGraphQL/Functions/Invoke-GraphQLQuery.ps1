@@ -266,6 +266,7 @@ function Invoke-GraphQLQuery {
             Body                   = $jsonRequestBody
             ContentType            = "application/json"
             ErrorAction            = "Stop"
+            UseBasicParsing        = $true
         }
 
         if ($PSBoundParameters.ContainsKey("Headers")) {
