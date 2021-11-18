@@ -12,7 +12,7 @@ function Get-GraphQLVariableList {
             rollDice(numDice: $dice, numSides: $sides)
         }'
 
-        Get-GraphQLVariableList -Query $query
+        Get-GraphQLVariableList -Query $query | Format-Table
 
         Gets a list of variable definitions from a GraphQL query.
     .EXAMPLE
