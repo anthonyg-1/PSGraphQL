@@ -63,6 +63,7 @@ function Get-GraphQLVariableList {
     )
     BEGIN {
         class GraphQLVariable {
+            [bool]$HasVariables = $false
             [string]$Operation = ""
             [string]$OperationType = ""
             [string]$Parameter = ""
@@ -103,6 +104,7 @@ function Get-GraphQLVariableList {
                 $parameterType = ($_.Split(":")[1]).Trim()
 
                 $gqlVariable = [GraphQLVariable]::new()
+                $gqlVariable.HasVariables = $true
                 $gqlVariable.Operation = $operationName
                 $gqlVariable.OperationType = $operationType
                 $gqlVariable.Parameter = $parameterName
@@ -129,6 +131,7 @@ function Get-GraphQLVariableList {
         else {
             $gqlVariable = [GraphQLVariable]::new()
             $gqlVariable.Operation = $operationName
+            $gqlVariable.OperationType = $operationType
             $results.Add($gqlVariable)
         }
 
