@@ -14,7 +14,7 @@ function Get-GraphQLVariableList {
 
         Get-GraphQLVariableList -Query $query | Format-Table
 
-        Gets a list of variable definitions from a GraphQL query.
+        Gets a list of variable definitions from a GraphQL query and renders the results to the console as a table.
     .EXAMPLE
         $wordListPath = ".\SQL.txt"
         $words = [IO.File]::ReadAllLines($wordListPath)
@@ -32,7 +32,7 @@ function Get-GraphQLVariableList {
             }
         }
 
-        Read in a SQL injection word list, iterate through the results of the variable list, filter on type String, then iterate through the SQL injection word list to attempt SQL injection via fuzzing against each discovered parameter.
+        Reads in a SQL injection word list, iterate through the results of the variable list, filter on type String, then iterate through the SQL injection word list to attempt SQL injection via fuzzing against each discovered parameter.
     .INPUTS
         System.String
     .LINK
@@ -53,6 +53,7 @@ function Get-GraphQLVariableList {
     BEGIN {
         class GraphQLVariable {
             [string]$Operation = ""
+            [string]$OperationType = ""
             [string]$Parameter = ""
             [string]$Type = ""
             [nullable[bool]]$Nullable = $null
@@ -72,9 +73,10 @@ function Get-GraphQLVariableList {
             Write-Error -Exception $ArgumentException -Category InvalidArgument -ErrorAction Stop
         }
 
-        # Get the query name via regex and splitting on the first space after query or mutation:
+        # Get the operation name and type via regex and splitting on the first space after query or mutation:
         $matchOnParanOrCurlyRegex = '^[^\(|{]+'
         $operationName = [regex]::Match(($cleanedQueryInput.Split(" ")[1]), $matchOnParanOrCurlyRegex) | Select-Object -ExpandProperty Value
+        $operationType = ([regex]::Match(($cleanedQueryInput.Split(" ")[0]), $matchOnParanOrCurlyRegex) | Select-Object -ExpandProperty Value).ToLower()
 
         # List of objects that are returned by default:
         $results = [List[GraphQLVariable]]::new()
@@ -91,6 +93,7 @@ function Get-GraphQLVariableList {
 
                 $gqlVariable = [GraphQLVariable]::new()
                 $gqlVariable.Operation = $operationName
+                $gqlVariable.OperationType = $operationType
                 $gqlVariable.Parameter = $parameterName
                 $gqlVariable.Type = ($parameterType.Replace("!", "").Replace("[", "").Replace("]", ""))
 
