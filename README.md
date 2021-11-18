@@ -169,7 +169,7 @@ $words = [IO.File]::ReadAllLines($wordListPath)
 
 $uri = "https://mytargetserver/v1/graphql"
 
-# Array to store results in from Invoke-GraphQLQuery -Detailed for later analysis:
+# Array to store results from Invoke-GraphQLQuery -Detailed for later analysis:
 $results = @()
 
 # Get the variable definition from the supplied mutation:
