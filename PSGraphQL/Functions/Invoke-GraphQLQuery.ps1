@@ -297,7 +297,7 @@ function Invoke-GraphQLQuery {
                 $gqlResponse.Response = $response.Content
                 $gqlResponse.ParsedResponse = $($response.Content | ConvertFrom-Json -ErrorAction Stop -WarningAction SilentlyContinue)
                 $gqlResponse.RawResponse = $response.RawContent
-                $gqlResponse.ExecutionTime = ($endDateTime - $startDateTime)
+                $gqlResponse.ExecutionTime = (New-TimeSpan -Start $startDateTime -End $endDateTime)
 
                 # Populate ResponseHeaders property:
                 [HashTable]$responseHeaders = @{ }
