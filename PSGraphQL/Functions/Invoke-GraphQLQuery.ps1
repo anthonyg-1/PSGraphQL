@@ -19,7 +19,7 @@ function Invoke-GraphQLQuery {
     .PARAMETER Raw
         Tells the function to return JSON as opposed to objects.
     .PARAMETER Detailed
-        Returns parsed and raw responses from the GraphQL endpoint as well as HTTP status code, description, response headers and session.
+        Returns parsed and raw responses from the GraphQL endpoint as well as HTTP status code, description, response headers, and session.
     .NOTES
         Query and mutation default return type is a collection of objects. To return results as JSON, use the -Raw parameter. To return both parsed and raw results, use the -Detailed parameter.
     .EXAMPLE
