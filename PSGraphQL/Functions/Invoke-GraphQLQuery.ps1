@@ -202,6 +202,7 @@ function Invoke-GraphQLQuery {
             [String]$RawResponse = ""
             [HashTable]$ResponseHeaders = @{ }
             [TimeSpan]$ExecutionTime
+            [Microsoft.PowerShell.Commands.WebRequestSession]$Session
         }
     }
     PROCESS {
@@ -273,8 +274,15 @@ function Invoke-GraphQLQuery {
             $params.Add("Headers", $Headers)
         }
 
+        # Use or establish a web session:
+        $currentSession = "currentSession"
         if ($PSBoundParameters.ContainsKey("WebSession")) {
-            $params.Add("WebSession", $WebSession)
+            $currentSession = $WebSession
+            $params.Add("WebSession", $currentSession)
+            $params.Add("SessionVariable", $currentSession)
+        }
+        else {
+            $params.Add("SessionVariable", $currentSession)
         }
 
         $response = $null
@@ -298,6 +306,7 @@ function Invoke-GraphQLQuery {
                 $gqlResponse.ParsedResponse = $($response.Content | ConvertFrom-Json -ErrorAction Stop -WarningAction SilentlyContinue)
                 $gqlResponse.RawResponse = $response.RawContent
                 $gqlResponse.ExecutionTime = (New-TimeSpan -Start $startDateTime -End $endDateTime)
+                $gqlResponse.Session = $currentSession
 
                 # Populate ResponseHeaders property:
                 [HashTable]$responseHeaders = @{ }
