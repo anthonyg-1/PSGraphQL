@@ -19,7 +19,7 @@ function Invoke-GraphQLQuery {
     .PARAMETER Raw
         Tells the function to return JSON as opposed to objects.
     .PARAMETER Detailed
-        Returns parsed and raw responses from the GraphQL endpoint as well as HTTP status code, description, response headers, and session.
+        Returns parsed and raw responses from the GraphQL endpoint as well as HTTP status code, description, and response headers.
     .NOTES
         Query and mutation default return type is a collection of objects. To return results as JSON, use the -Raw parameter. To return both parsed and raw results, use the -Detailed parameter.
     .EXAMPLE
@@ -277,9 +277,7 @@ function Invoke-GraphQLQuery {
         # Use or establish a web session:
         $currentSession = "currentSession"
         if ($PSBoundParameters.ContainsKey("WebSession")) {
-            $currentSession = $WebSession
-            $params.Add("WebSession", $currentSession)
-            $params.Add("SessionVariable", $currentSession)
+            $params.Add("WebSession", $WebSession)
         }
         else {
             $params.Add("SessionVariable", $currentSession)
@@ -299,6 +297,7 @@ function Invoke-GraphQLQuery {
                 # Capture the end time in order to obtain the delta for the ExecutionTime property:
                 $endDateTime = Get-Date
 
+                # Populate properties of return object:
                 $gqlResponse = [GraphQLResponseObject]::new()
                 $gqlResponse.StatusCode = $response.StatusCode
                 $gqlResponse.StatusDescription = $response.StatusDescription
@@ -306,7 +305,13 @@ function Invoke-GraphQLQuery {
                 $gqlResponse.ParsedResponse = $($response.Content | ConvertFrom-Json -ErrorAction Stop -WarningAction SilentlyContinue)
                 $gqlResponse.RawResponse = $response.RawContent
                 $gqlResponse.ExecutionTime = (New-TimeSpan -Start $startDateTime -End $endDateTime)
-                $gqlResponse.Session = $currentSession
+
+                if ($PSBoundParameters.ContainsKey("WebSession")) {
+                    $gqlResponse.Session = $WebSession
+                }
+                else {
+                    $gqlResponse.Session = $currentSession
+                }
 
                 # Populate ResponseHeaders property:
                 [HashTable]$responseHeaders = @{ }
