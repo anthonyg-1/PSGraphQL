@@ -283,11 +283,16 @@ function Invoke-GraphQLQuery {
             $params.Add("SessionVariable", $currentSession)
         }
 
-        $response = $null
+        if ($PSVersionTable.PSVersion.Major -ge 7) {
+            $params.Add("SkipHttpErrorCheck", $true)
+        }
 
         if ($PSBoundParameters.ContainsKey("Detailed")) {
-            try {
+            # Object to be returned for the Detailed parameter:
+            $gqlResponse = [GraphQLResponseObject]::new()
 
+            $response = $null
+            try {
                 # Capture the start time:
                 $startDateTime = Get-Date
 
@@ -297,34 +302,43 @@ function Invoke-GraphQLQuery {
                 # Capture the end time in order to obtain the delta for the ExecutionTime property:
                 $endDateTime = Get-Date
 
-                # Populate properties of return object:
-                $gqlResponse = [GraphQLResponseObject]::new()
-                $gqlResponse.StatusCode = $response.StatusCode
-                $gqlResponse.StatusDescription = $response.StatusDescription
-                $gqlResponse.Response = $response.Content
-                $gqlResponse.ParsedResponse = $($response.Content | ConvertFrom-Json -ErrorAction Stop -WarningAction SilentlyContinue)
-                $gqlResponse.RawResponse = $response.RawContent
+                # Calculate execution time:
                 $gqlResponse.ExecutionTime = (New-TimeSpan -Start $startDateTime -End $endDateTime)
-
-                if ($PSBoundParameters.ContainsKey("WebSession")) {
-                    $gqlResponse.Session = $WebSession
-                }
-                else {
-                    $gqlResponse.Session = $currentSession
-                }
-
-                # Populate ResponseHeaders property:
-                [HashTable]$responseHeaders = @{ }
-                $response.Headers.GetEnumerator() | ForEach-Object {
-                    $responseHeaders.Add($_.Key, $_.Value)
-                }
-                $gqlResponse.ResponseHeaders = $responseHeaders
-
-                return $gqlResponse
             }
             catch {
                 Write-Error -Exception $_.Exception -Category InvalidOperation -ErrorAction Stop
             }
+
+            # Populate properties of object to be returned:
+            $gqlResponse.StatusCode = $response.StatusCode
+            $gqlResponse.StatusDescription = $response.StatusDescription
+            $gqlResponse.Response = $response.Content
+
+            # Attempt to deserialize Content from JSON, if not populate ParsedResponse with a null value:
+            try {
+                $gqlResponse.ParsedResponse = $($response.Content | ConvertFrom-Json -ErrorAction Stop -WarningAction SilentlyContinue)
+            }
+            catch {
+                $gqlResponse.ParsedResponse = $null
+            }
+
+            $gqlResponse.RawResponse = $response.RawContent
+
+            if ($PSBoundParameters.ContainsKey("WebSession")) {
+                $gqlResponse.Session = $WebSession
+            }
+            else {
+                $gqlResponse.Session = $currentSession
+            }
+
+            # Populate ResponseHeaders property:
+            [HashTable]$responseHeaders = @{ }
+            $response.Headers.GetEnumerator() | ForEach-Object {
+                $responseHeaders.Add($_.Key, $_.Value)
+            }
+            $gqlResponse.ResponseHeaders = $responseHeaders
+
+            return $gqlResponse
         }
         else {
             try {
