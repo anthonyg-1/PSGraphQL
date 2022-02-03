@@ -283,13 +283,14 @@ function Invoke-GraphQLQuery {
             $params.Add("SessionVariable", $currentSession)
         }
 
-        if ($PSVersionTable.PSVersion.Major -ge 7) {
-            $params.Add("SkipHttpErrorCheck", $true)
-        }
-
         if ($PSBoundParameters.ContainsKey("Detailed")) {
             # Object to be returned for the Detailed parameter:
             $gqlResponse = [GraphQLResponseObject]::new()
+
+            # Skip HTTP error checking only when the Detailed parameter is used:
+            if ($PSVersionTable.PSVersion.Major -ge 7) {
+                $params.Add("SkipHttpErrorCheck", $true)
+            }
 
             $response = $null
             try {
