@@ -42,15 +42,15 @@ function Get-GraphQLVariableList {
         $word = $_
 
         $variableList | Select Parameter, Type | ForEach-Object {
-            $randomInt = Get-Random                
+            $randomInt = Get-Random
                 if ($_.Type -eq "Int") {
                     if (-not($queryVarTable.ContainsKey($_.Parameter))) {
-                        $queryVarTable.Add($_.Parameter, $randomInt)                        
+                        $queryVarTable.Add($_.Parameter, $randomInt)
                     }
                 }
                 else {
                 if (-not($queryVarTable.ContainsKey($_.Parameter))) {
-                        $queryVarTable.Add($_.Parameter, $word)                        
+                        $queryVarTable.Add($_.Parameter, $word)
                     }
                 }
             }
