@@ -6,14 +6,14 @@ This PowerShell module contains functions that facilitate query and mutation ope
 :penguin: `Linux`
 :apple: `MacOS`
 
+### Requirements
+Requires PowerShell 5.1 or above.
+
 ### Installation
 
 ```powershell
 Install-Module -Name PSGraphQL -Repository PSGallery -Scope CurrentUser
 ```
-
-### Requirements
-Requires PowerShell 5.1 or above.
 
 ## Examples
 
