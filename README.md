@@ -9,7 +9,6 @@ This PowerShell module contains functions that facilitate query and mutation ope
 ### Installation
 
 ```powershell
-# Installing the module
 Install-Module -Name PSGraphQL -Repository PSGallery -Scope CurrentUser
 ```
 
