@@ -175,26 +175,26 @@ $results = @()
 $variableList = $query | Get-GraphQLVariableList
 
 $words | ForEach-Object {
-$queryVarTable = @{}
-$word = $_
+    $queryVarTable = @{}
+    $word = $_
 
-$variableList | Select Parameter, Type | ForEach-Object {
-    $randomInt = Get-Random       
-        if ($_.Type -eq "Int") {
+    $variableList | Select Parameter, Type | ForEach-Object {
+        $randomInt = Get-Random       
+            if ($_.Type -eq "Int") {
+                if (-not($queryVarTable.ContainsKey($_.Parameter))) {
+                    $queryVarTable.Add($_.Parameter, $randomInt)               
+                }
+            }
+            else {
             if (-not($queryVarTable.ContainsKey($_.Parameter))) {
-                $queryVarTable.Add($_.Parameter, $randomInt)               
+                    $queryVarTable.Add($_.Parameter, $word)                
+                }
             }
         }
-        else {
-        if (-not($queryVarTable.ContainsKey($_.Parameter))) {
-                $queryVarTable.Add($_.Parameter, $word)                
-            }
-        }
-    }
 
-    $gqlResult = Invoke-GraphQLQuery -Mutation $mutation -Variables $queryVarTable -Headers $headers -Uri $uri -Detailed
-    $result = [PSCustomObject]@{ParamValues=($queryVarTable);Result=($gqlResult)}
-    $results += $result
+        $gqlResult = Invoke-GraphQLQuery -Mutation $mutation -Variables $queryVarTable -Headers $headers -Uri $uri -Detailed
+        $result = [PSCustomObject]@{ParamValues=($queryVarTable);Result=($gqlResult)}
+        $results += $result
 }
 ```
 
