@@ -265,7 +265,7 @@ function Invoke-GraphQLQuery {
         [HashTable]$params = @{Uri = $Uri
             Method                 = "Post"
             Body                   = $jsonRequestBody
-            ContentType            = "application/json"
+            ContentType            = "application/json; charset=utf-8"
             ErrorAction            = "Stop"
             UseBasicParsing        = $true
         }
