@@ -18,6 +18,8 @@ function Invoke-GraphQLQuery {
         Specifies a web request session. Enter the variable name, including the dollar sign (`$`).
     .PARAMETER Raw
         Tells the function to return JSON as opposed to objects.
+    .PARAMETER ContentType
+        Specifies the ContentType for the Webrequest (Default: "application/json"). Can be used to resolve encoding problems.
     .PARAMETER Detailed
         Returns parsed and raw responses from the GraphQL endpoint as well as HTTP status code, description, and response headers.
     .NOTES
@@ -189,6 +191,10 @@ function Invoke-GraphQLQuery {
 
         [Parameter(Mandatory = $false, Position = 6)][Alias("AsJson", "json", "r")][Switch]$Raw,
 
+        [Parameter(Mandatory = $false,
+            ValueFromPipelineByPropertyName = $false,
+            Position = 7)][Alias("ct")][string]$ContentType = "application/json",
+
         [Parameter(Mandatory = $false, ParameterSetName = "Detailed", Position = 7)][Switch]$Detailed
 
     )
@@ -265,7 +271,7 @@ function Invoke-GraphQLQuery {
         [HashTable]$params = @{Uri = $Uri
             Method                 = "Post"
             Body                   = $jsonRequestBody
-            ContentType            = "application/json"
+            ContentType            = $ContentType
             ErrorAction            = "Stop"
             UseBasicParsing        = $true
         }
