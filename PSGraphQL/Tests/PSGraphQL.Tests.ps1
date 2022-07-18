@@ -6,7 +6,7 @@ $myDefaultDirectory = Get-Location
 Set-Location -Path $myDefaultDirectory
 Set-Location -Path ..
 
-$module = 'PSGraphQL'
+$module = "PSGraphQL"
 
 $moduleDirectory = Get-Item -Path $myDefaultDirectory | Select-Object -ExpandProperty FullName
 
@@ -35,15 +35,18 @@ Describe "$module Module Structure and Validation Tests" -Tag Linting -WarningAc
     }
 
     Context "Code Validation" {
-        Get-ChildItem -Path "$moduleDirectory" -Filter *.ps1 -Recurse | ForEach-Object {
-            It "$_ is valid PowerShell code" {
-                $psFile = Get-Content -Path $_.FullName -ErrorAction Stop
+        $allPs1Files = Get-ChildItem -Path "$moduleDirectory" -Filter *.ps1 -Recurse
+        $allPs1Files | ForEach-Object {
+            $ps1FilePath = $_.FullName
+            It ("{0} is valid PowerShell code" -f $ps1FilePath) {
+                $psFile = Get-Content -Path $ps1FilePath -ErrorAction Stop
                 $errors = $null
                 $null = [System.Management.Automation.PSParser]::Tokenize($psFile, [ref]$errors)
                 $errors.Count | Should -Be 0
             }
         }
     }
+
 
     Context "$module.psd1" {
         It "should not throw an exception in import" {
@@ -53,6 +56,7 @@ Describe "$module Module Structure and Validation Tests" -Tag Linting -WarningAc
     }
 
 }
+
 
 Describe "Testing module and cmdlets against PSSA rules" -Tag Linting -WarningAction SilentlyContinue {
     $scriptAnalyzerRules = Get-ScriptAnalyzerRule
