@@ -172,7 +172,7 @@ $uri = "https://mytargetserver/v1/graphql"
 $results = @()
 
 # Get the variable definition from the supplied mutation:
-$variableList = $query | Get-GraphQLVariableList
+$variableList = $mutation | Get-GraphQLVariableList
 
 $words | ForEach-Object {
     $queryVarTable = @{}
@@ -180,21 +180,21 @@ $words | ForEach-Object {
 
     $variableList | Select Parameter, Type | ForEach-Object {
         $randomInt = Get-Random       
-            if ($_.Type -eq "Int") {
-                if (-not($queryVarTable.ContainsKey($_.Parameter))) {
-                    $queryVarTable.Add($_.Parameter, $randomInt)               
-                }
-            }
-            else {
+        if ($_.Type -eq "Int") {
             if (-not($queryVarTable.ContainsKey($_.Parameter))) {
-                    $queryVarTable.Add($_.Parameter, $word)                
-                }
+                $queryVarTable.Add($_.Parameter, $randomInt)               
             }
         }
+        else {
+            if (-not($queryVarTable.ContainsKey($_.Parameter))) {
+                $queryVarTable.Add($_.Parameter, $word)                
+            }
+        }
+    }
 
-        $gqlResult = Invoke-GraphQLQuery -Mutation $mutation -Variables $queryVarTable -Headers $headers -Uri $uri -Detailed
-        $result = [PSCustomObject]@{ParamValues=($queryVarTable);Result=($gqlResult)}
-        $results += $result
+    $gqlResult = Invoke-GraphQLQuery -Mutation $mutation -Variables $queryVarTable -Headers $headers -Uri $uri -Detailed    
+    $result = [PSCustomObject]@{ParamValues = ($queryVarTable); Result = ($gqlResult) }    
+    $results += $result
 }
 ```
 
