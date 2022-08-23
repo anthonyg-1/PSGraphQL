@@ -152,8 +152,8 @@ function Invoke-GraphQLQuery {
 
         Sends a GraphQL mutation to the endpoint 'https://mytargetserver/v1/graphql' with the results returned as JSON.
     .EXAMPLE
-        gql -q 'query { users { created_at id last_seen name } }' -u 'https://mytargetserver/v1/graphql' -
-
+        gql -q 'query { users { created_at id last_seen name } }' -u 'https://mytargetserver/v1/graphql' -r
+        
         Sends a GraphQL query to an endpoint with the results returned as JSON (as a one-liner using aliases).
     .LINK
         https://graphql.org/
