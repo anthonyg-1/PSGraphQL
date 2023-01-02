@@ -2,7 +2,7 @@
 This PowerShell module contains functions that facilitate query and mutation operations against GraphQL endpoints.
 
 ### Tested on
-:desktop_computer: `Windows 10`
+:desktop_computer: `Windows 10/11`
 :penguin: `Linux`
 :apple: `MacOS`
 
