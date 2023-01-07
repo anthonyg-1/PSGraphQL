@@ -23,7 +23,7 @@ function Invoke-GraphQLQuery {
     .PARAMETER Detailed
         Returns parsed and raw responses from the GraphQL endpoint as well as HTTP status code, description, and response headers.
     .PARAMETER EscapeHandling
-        Specifies the escape handling mechanism for JSON conversion.
+        Specifies the escape handling mechanism for JSON conversion. Usage of this parameter is only applicable to PowerShell versions 6 and above.
     .NOTES
         Query and mutation default return type is a collection of objects. To return results as JSON, use the -Raw parameter. To return both parsed and raw results, use the -Detailed parameter.
     .EXAMPLE
@@ -155,7 +155,7 @@ function Invoke-GraphQLQuery {
         Sends a GraphQL mutation to the endpoint 'https://mytargetserver/v1/graphql' with the results returned as JSON.
     .EXAMPLE
         gql -q 'query { users { created_at id last_seen name } }' -u 'https://mytargetserver/v1/graphql' -r
-        
+
         Sends a GraphQL query to an endpoint with the results returned as JSON (as a one-liner using aliases).
     .LINK
         https://graphql.org/
@@ -195,13 +195,13 @@ function Invoke-GraphQLQuery {
 
         [Parameter(Mandatory = $false,
             ValueFromPipelineByPropertyName = $false,
-            Position = 7)][Alias("ct")][string]$ContentType = "application/json",
+            Position = 7)][Alias("ct")][System.String]$ContentType = "application/json",
 
         [Parameter(Mandatory = $false, ParameterSetName = "Detailed", Position = 7)][Switch]$Detailed,
-        
+
         [Parameter(Mandatory = $false,
             ValueFromPipelineByPropertyName = $false,
-            Position = 8)][Alias("eh")][Newtonsoft.Json.StringEscapeHandling]$escapeHandling = "Default"
+            Position = 8)][ValidateSet('Default', 'EscapeNonAscii', 'EscapeHtml')][Alias("eh")][System.String]$EscapeHandling = "Default"
 
     )
     BEGIN {
@@ -216,6 +216,9 @@ function Invoke-GraphQLQuery {
             [TimeSpan]$ExecutionTime
             [Microsoft.PowerShell.Commands.WebRequestSession]$Session
         }
+
+        # Used to determine if running PowerShell Core or earlier:
+        $psMajorVersion = $PSVersionTable.PSVersion.Major
     }
     PROCESS {
         # The object that will ultimately be serialized and sent to the GraphQL endpoint:
@@ -268,7 +271,16 @@ function Invoke-GraphQLQuery {
         # Serialize $jsonRequestObject:
         [string]$jsonRequestBody = ""
         try {
-            $jsonRequestBody = $jsonRequestObject | ConvertTo-Json -Depth 100 -Compress -EscapeHandling $escapeHandling -ErrorAction Stop -WarningAction SilentlyContinue
+            if ($psMajorVersion -gt 5) {
+                $jsonRequestBody = $jsonRequestObject | ConvertTo-Json -Depth 100 -Compress -EscapeHandling $EscapeHandling -ErrorAction Stop -WarningAction SilentlyContinue
+            }
+            else {
+                $jsonRequestBody = $jsonRequestObject | ConvertTo-Json -Depth 100 -Compress -ErrorAction Stop -WarningAction SilentlyContinue
+
+                if ($PSBoundParameters.ContainsKey("EscapeHandling")) {
+                    Write-Warning -Message "EscapeHandling is not supported for Invoke-GraphQLQuery for the detected PowerShell version."
+                }
+            }
         }
         catch {
             Write-Error -Exception $_.Exception -Category InvalidResult -ErrorAction Stop
