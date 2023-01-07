@@ -22,6 +22,8 @@ function Invoke-GraphQLQuery {
         Specifies the ContentType for the Webrequest (Default: "application/json"). Can be used to resolve encoding problems.
     .PARAMETER Detailed
         Returns parsed and raw responses from the GraphQL endpoint as well as HTTP status code, description, and response headers.
+    .PARAMETER EscapeHandling
+        Specifies the escape handling mechanism for JSON conversion.
     .NOTES
         Query and mutation default return type is a collection of objects. To return results as JSON, use the -Raw parameter. To return both parsed and raw results, use the -Detailed parameter.
     .EXAMPLE
@@ -195,7 +197,11 @@ function Invoke-GraphQLQuery {
             ValueFromPipelineByPropertyName = $false,
             Position = 7)][Alias("ct")][string]$ContentType = "application/json",
 
-        [Parameter(Mandatory = $false, ParameterSetName = "Detailed", Position = 7)][Switch]$Detailed
+        [Parameter(Mandatory = $false, ParameterSetName = "Detailed", Position = 7)][Switch]$Detailed,
+        
+        [Parameter(Mandatory = $false,
+            ValueFromPipelineByPropertyName = $false,
+            Position = 8)][Alias("eh")][Newtonsoft.Json.StringEscapeHandling]$escapeHandling = "Default"
 
     )
     BEGIN {
@@ -262,7 +268,7 @@ function Invoke-GraphQLQuery {
         # Serialize $jsonRequestObject:
         [string]$jsonRequestBody = ""
         try {
-            $jsonRequestBody = $jsonRequestObject | ConvertTo-Json -Depth 100 -Compress -ErrorAction Stop -WarningAction SilentlyContinue
+            $jsonRequestBody = $jsonRequestObject | ConvertTo-Json -Depth 100 -Compress -EscapeHandling $escapeHandling -ErrorAction Stop -WarningAction SilentlyContinue
         }
         catch {
             Write-Error -Exception $_.Exception -Category InvalidResult -ErrorAction Stop
