@@ -6,6 +6,8 @@ function Get-GraphQLVariableList {
         Gets a list of variable (argument) names, types, and nullable status from a GraphQL operation.
     .PARAMETER Query
         The GraphQL operation (query or mutation) to obtain the variable definitions from.
+    .PARAMETER FilePath
+        The path to a file containing a GraphQL query to obtain the variable definitions from.
     .EXAMPLE
         $query = '
             query RollDice($dice: Int!, $sides: Int) {
@@ -15,6 +17,11 @@ function Get-GraphQLVariableList {
         Get-GraphQLVariableList -Query $query | Format-Table
 
         Gets a list of variable definitions from a GraphQL query and renders the results to the console as a table.
+    .EXAMPLE
+        $queryFilePath = "./queries/rolldice.gql"
+        Get-GraphQLVariableList -FilePath $queryFilePath
+
+        Gets a list of variable definitions from a file containing a GraphQL query and renders the results to the console as a table.
     .EXAMPLE
         $mutation = '
             mutation AddNewPet ($name: String!, $petType: PetType, $petLocation: String!, $petId: Int!) {
@@ -74,9 +81,12 @@ function Get-GraphQLVariableList {
     <##>
     Param
     (
-        [Parameter(Mandatory = $true,
+        [Parameter(Mandatory = $true, ParameterSetName = "Query",
             ValueFromPipeline = $true,
-            Position = 0)][ValidateLength(12, 1073741791)][Alias("Operation", "Mutation")][System.String]$Query
+            Position = 0)][ValidateLength(12, 1073741791)][Alias("Operation", "Mutation")][System.String]$Query,
+
+        [Parameter(Mandatory = $false, ParameterSetName = "FilePath", Position = 0)][ValidateNotNullOrEmpty()][Alias('f', 'Path')][System.IO.FileInfo]$FilePath
+
     )
     BEGIN {
         class GraphQLVariable {
@@ -94,8 +104,16 @@ function Get-GraphQLVariableList {
         # Exception to be used through the function in the case that an invalid GraphQL query or mutation is passed:
         $ArgumentException = New-Object -TypeName ArgumentException -ArgumentList "Not a valid GraphQL query or mutation. Verify syntax and try again."
 
+        [string]$graphQlQuery = ""
+        if ($PSBoundParameters.ContainsKey("FilePath")) {
+            $graphQlQuery = Get-Content -Path $FilePath -Raw
+        }
+        else {
+            $graphQlQuery = $Query
+        }
+
         # Compress and trim the incoming query for all operations within this function:
-        [string]$cleanedQueryInput = Compress-String -InputString $Query
+        [string]$cleanedQueryInput = Compress-String -InputString $graphQlQuery
 
         # Attempt to determine if value passed to the query parameter is an actual GraphQL query or mutation. If not, throw:
         if (($cleanedQueryInput -notlike "query*") -and ($cleanedQueryInput -notlike "mutation*") ) {
