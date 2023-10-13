@@ -26,6 +26,8 @@ function Invoke-GraphQLQuery {
         Returns parsed and raw responses from the GraphQL endpoint as well as HTTP status code, description, and response headers.
     .PARAMETER EscapeHandling
         Specifies the escape handling mechanism for JSON conversion. Usage of this parameter is only applicable to PowerShell versions 6 and above.
+    .PARAMETER SkipCertificateCheck
+        Tells the function to skip certificate validation checks that include expiration, revocation, trusted root authority, etc. This parameter is only supported in PowerShell 7 or greater.
     .NOTES
         Query and mutation default return type is a collection of objects. To return results as JSON, use the -Raw parameter. To return both parsed and raw results, use the -Detailed parameter.
     .EXAMPLE
@@ -215,8 +217,11 @@ function Invoke-GraphQLQuery {
 
         [Parameter(Mandatory = $false,
             ValueFromPipelineByPropertyName = $false,
-            Position = 8)][ValidateSet('Default', 'EscapeNonAscii', 'EscapeHtml')][Alias("eh")][System.String]$EscapeHandling = "Default"
+            Position = 8)][ValidateSet('Default', 'EscapeNonAscii', 'EscapeHtml')][Alias("eh")][System.String]$EscapeHandling = "Default",
 
+        [Parameter(Mandatory = $false,
+            ValueFromPipelineByPropertyName = $false,
+            Position = 9)][Alias("notls")][Switch]$SkipCertificateCheck
     )
     BEGIN {
         # Return type when using the -Detailed switch:
@@ -317,8 +322,13 @@ function Invoke-GraphQLQuery {
         }
 
         # Skip TLS validation if PowerShell Core:
-        if ($PSVersionTable.PSVersion.Major -ge 7) {
-            $params.Add("SkipCertificateCheck", $true)
+        if ($PSBoundParameters.ContainsKey("SkipCertificateCheck")) {
+            if ($PSVersionTable.PSVersion.Major -ge 7) {
+                $params.Add("SkipCertificateCheck", $true)
+            }
+            else {
+                Write-Warning -Message "The SkipCertificateCheck parameter is only supported in PowerShell 7 or greater."
+            }
         }
 
         if ($PSBoundParameters.ContainsKey("Headers")) {
@@ -397,7 +407,7 @@ function Invoke-GraphQLQuery {
                 $response = Invoke-RestMethod @params
             }
             catch {
-                Write-Error -Exception $_.Exception -Category InvalidOperation -ErrorAction Stop
+                Write-Error -Exception $_.Exception.InnerException -Category InvalidOperation -ErrorAction Stop
             }
 
             if ($PSBoundParameters.ContainsKey("Raw")) {
@@ -405,7 +415,7 @@ function Invoke-GraphQLQuery {
                     return $($response | ConvertTo-Json -Depth 100 -ErrorAction Stop -WarningAction SilentlyContinue)
                 }
                 catch {
-                    Write-Error -Exception $_.Exception -Category InvalidResult -ErrorAction Stop
+                    Write-Error -Exception $_.Exception.InnerException -Category InvalidResult -ErrorAction Stop
                 }
             }
             else {
@@ -413,7 +423,7 @@ function Invoke-GraphQLQuery {
                     return $response
                 }
                 catch {
-                    Write-Error -Exception $_.Exception -Category InvalidResult -ErrorAction Stop
+                    Write-Error -Exception $_.Exception.InnerException -Category InvalidResult -ErrorAction Stop
                 }
             }
         }
