@@ -19,7 +19,7 @@ function Invoke-GraphQLQuery {
     .PARAMETER WebSession
         Specifies a web request session. Enter the variable name, including the dollar sign (`$`).
     .PARAMETER Raw
-        Tells the function to return JSON as opposed to objects.
+        Tells the function to return a JSON string as opposed to objects.
     .PARAMETER ContentType
         Specifies the ContentType for the Webrequest (Default: "application/json"). Can be used to resolve encoding problems.
     .PARAMETER Detailed
