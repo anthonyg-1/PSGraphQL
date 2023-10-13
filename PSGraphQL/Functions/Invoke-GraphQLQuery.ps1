@@ -316,6 +316,11 @@ function Invoke-GraphQLQuery {
             UseBasicParsing        = $true
         }
 
+        # Skip TLS validation if PowerShell Core:
+        if ($PSVersionTable.PSVersion.Major -ge 7) {
+            $params.Add("SkipCertificateCheck", $true)
+        }
+
         if ($PSBoundParameters.ContainsKey("Headers")) {
             $params.Add("Headers", $Headers)
         }
