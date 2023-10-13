@@ -38,6 +38,15 @@ $variables = '
 Invoke-GraphQLQuery -Query $query -OperationName $opName -Variables $variables -Uri $uri       
 ```
 
+### Send a GraphQL query with a query defined in a file including operation name and variables
+```powershell
+$uri = "https://mytargetserver/v1/graphql"
+
+$queryFilePath = "./queries/rolldice.gql"
+
+Invoke-GraphQLQuery -FilePath $queryFilePath -Variables $variables -Uri $uri
+```
+
 ### Send a GraphQL query to an endpoint including operation name and variables as a HashTable
 ```powershell
 
