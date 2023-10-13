@@ -6,6 +6,8 @@ function Invoke-GraphQLQuery {
         Sends a query (read operation) or mutation (create, update, delete operation) to a GraphQL endpoint.
     .PARAMETER Query
         The GraphQL query or mutation to send to the endpoint.
+    .PARAMETER FilePath
+        The path to a file containing a GraphQL query.
     .PARAMETER OperationName
         A meaningful and explicit name for your GraphQL operation.
     .PARAMETER Variables
@@ -43,6 +45,14 @@ function Invoke-GraphQLQuery {
         Invoke-GraphQLQuery -Query $query -Variables $variables -Uri $uri
 
         Sends a GraphQL query to the endpoint 'https://mytargetserver/v1/graphql' with variables defined in $variables as JSON.
+    .EXAMPLE
+        $uri = "https://mytargetserver/v1/graphql"
+
+        $queryFilePath "./queries/rolldice.gql"
+
+        Invoke-GraphQLQuery -FilePath $queryFilePath -Variables $variables -Uri $uri
+
+        Sends a GraphQL query to the endpoint 'https://mytargetserver/v1/graphql' with the query defined in ./queries/rolldice.gql including variables defined in $variables as JSON.
     .EXAMPLE
         $uri = "https://mytargetserver/v1/graphql"
 
@@ -162,14 +172,16 @@ function Invoke-GraphQLQuery {
         Format-Table
         Get-GraphQLVariableList
     #>
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = "Query")]
     [Alias("gql", "Invoke-GraphQLMutation", "Invoke-GraphQLOperation")]
     [OutputType([System.Management.Automation.PSCustomObject], [System.String], [GraphQLResponseObject])]
     Param
     (
-        [Parameter(Mandatory = $false,
+        [Parameter(Mandatory = $false, ParameterSetName = "Query",
             ValueFromPipelineByPropertyName = $false,
             Position = 0)][ValidateLength(12, 1073741791)][Alias("Mutation", "Operation", "q", "m", "o")][System.String]$Query = "query introspection { __schema { types { name kind description } } }",
+
+        [Parameter(Mandatory = $false, ParameterSetName = "FilePath", Position = 0)][ValidateNotNullOrEmpty()][Alias('f', 'Path')][System.IO.FileInfo]$FilePath,
 
         [Parameter(Mandatory = $false,
             ValueFromPipelineByPropertyName = $false,
@@ -197,6 +209,8 @@ function Invoke-GraphQLQuery {
             ValueFromPipelineByPropertyName = $false,
             Position = 7)][Alias("ct")][System.String]$ContentType = "application/json",
 
+        [Parameter(ParameterSetName = "Query")]
+        [Parameter(ParameterSetName = "FilePath")]
         [Parameter(Mandatory = $false, ParameterSetName = "Detailed", Position = 7)][Switch]$Detailed,
 
         [Parameter(Mandatory = $false,
@@ -223,6 +237,14 @@ function Invoke-GraphQLQuery {
     PROCESS {
         # The object that will ultimately be serialized and sent to the GraphQL endpoint:
         $jsonRequestObject = [ordered]@{ }
+
+        [string]$graphQlQuery = ""
+        if ($PSBoundParameters.ContainsKey("FilePath")) {
+            $graphQlQuery = Get-Content -Path $FilePath -Raw
+        }
+        else {
+            $graphQlQuery = $Query
+        }
 
         # Trim all spaces and flatten $OperationName parameter value and add to $jsonRequestObject:
         if ($PSBoundParameters.ContainsKey("OperationName")) {
@@ -258,14 +280,14 @@ function Invoke-GraphQLQuery {
             }
         }
 
-        # Trim all spaces and flatten $Query parameter value and add to $jsonRequestObject:
-        $cleanedQueryInput = Compress-String -InputString $Query
+        # Trim all spaces and flatten $Query or $FilePath parameter data and add to $jsonRequestObject:
+        $cleanedQueryInput = Compress-String -InputString $graphQlQuery
         if (($cleanedQueryInput.ToLower() -notlike "query*") -and ($cleanedQueryInput.ToLower() -notlike "mutation*") ) {
             $ArgumentException = New-Object -TypeName ArgumentException -ArgumentList "Not a valid GraphQL query or mutation. Verify syntax and try again."
             Write-Error -Exception $ArgumentException -Category InvalidArgument -ErrorAction Stop
         }
 
-        # Add $Query $jsonRequestObject:
+        # Add $graphQlQuery $jsonRequestObject:
         $jsonRequestObject.Add("query", $cleanedQueryInput)
 
         # Serialize $jsonRequestObject:
