@@ -48,7 +48,7 @@ function Invoke-GraphQLQuery {
     .EXAMPLE
         $uri = "https://mytargetserver/v1/graphql"
 
-        $queryFilePath "./queries/rolldice.gql"
+        $queryFilePath = "./queries/rolldice.gql"
 
         Invoke-GraphQLQuery -FilePath $queryFilePath -Variables $variables -Uri $uri
 
