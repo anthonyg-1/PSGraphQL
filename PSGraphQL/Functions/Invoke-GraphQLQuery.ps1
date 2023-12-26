@@ -407,7 +407,12 @@ function Invoke-GraphQLQuery {
                 $response = Invoke-RestMethod @params
             }
             catch {
-                Write-Error -Exception $_.Exception.InnerException -Category InvalidOperation -ErrorAction Stop
+                if ($null -ne $_.Exception.InnerException) {
+                    Write-Error -Exception $_.Exception.InnerException -Category InvalidOperation -ErrorAction Stop
+                }
+                else {
+                    Write-Error -Exception $_.Exception -Category InvalidOperation -ErrorAction Stop
+                }
             }
 
             if ($PSBoundParameters.ContainsKey("Raw")) {
@@ -415,7 +420,12 @@ function Invoke-GraphQLQuery {
                     return $($response | ConvertTo-Json -Depth 100 -ErrorAction Stop -WarningAction SilentlyContinue)
                 }
                 catch {
-                    Write-Error -Exception $_.Exception.InnerException -Category InvalidResult -ErrorAction Stop
+                    if ($null -ne $_.Exception.InnerException) {
+                        Write-Error -Exception $_.Exception.InnerException -Category InvalidOperation -ErrorAction Stop
+                    }
+                    else {
+                        Write-Error -Exception $_.Exception -Category InvalidOperation -ErrorAction Stop
+                    }
                 }
             }
             else {
@@ -423,7 +433,12 @@ function Invoke-GraphQLQuery {
                     return $response
                 }
                 catch {
-                    Write-Error -Exception $_.Exception.InnerException -Category InvalidResult -ErrorAction Stop
+                    if ($null -ne $_.Exception.InnerException) {
+                        Write-Error -Exception $_.Exception.InnerException -Category InvalidOperation -ErrorAction Stop
+                    }
+                    else {
+                        Write-Error -Exception $_.Exception -Category InvalidOperation -ErrorAction Stop
+                    }
                 }
             }
         }
