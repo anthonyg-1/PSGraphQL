@@ -245,7 +245,7 @@ function Invoke-GraphQLQuery {
 
         [string]$graphQlQuery = ""
         if ($PSBoundParameters.ContainsKey("FilePath")) {
-            $graphQlQuery = Get-Content -Path $FilePath -Raw
+            $graphQlQuery = Get-Content -Path $FilePath.FullName -Raw
         }
         else {
             $graphQlQuery = $Query
