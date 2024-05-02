@@ -83,7 +83,22 @@ Describe "Testing module and cmdlets against PSSA rules" -Tag Linting -WarningAc
             foreach ($rule in $scriptAnalyzerRules) {
                 It "should pass $rule" {
                     If ($analysis.RuleName -contains $rule) {
-                        $analysis | Where RuleName -eq $rule -OutVariable failures
+                        $analysis | Where-Object RuleName -eq $rule -OutVariable failures
+                        $failures.Count | Should -Be 0
+                    }
+                }
+            }
+        }
+
+        Context "$_ test against InjectionHunter rules" {
+            $injectionHunterModulePath = Get-Module -Name InjectionHunter -ListAvailable | Select-Object -ExpandProperty Path
+
+            $analysis = Invoke-ScriptAnalyzer -Path $_.FullName -CustomRulePath $injectionHunterModulePath
+
+            foreach ($rule in $scriptAnalyzerRules) {
+                It "should pass $rule" {
+                    If ($analysis.RuleName -contains $rule) {
+                        $analysis | Where-Object RuleName -eq $rule -OutVariable failures
                         $failures.Count | Should -Be 0
                     }
                 }
@@ -98,7 +113,22 @@ Describe "Testing module and cmdlets against PSSA rules" -Tag Linting -WarningAc
             foreach ($rule in $scriptAnalyzerRules) {
                 It "should pass $rule" {
                     If ($analysis.RuleName -contains $rule) {
-                        $analysis | Where RuleName -eq $rule -OutVariable failures
+                        $analysis | Where-Object RuleName -eq $rule -OutVariable failures
+                        $failures.Count | Should -Be 0
+                    }
+                }
+            }
+        }
+
+        Context "$_ test against InjectionHunter rules" {
+            $injectionHunterModulePath = Get-Module -Name InjectionHunter -ListAvailable | Select-Object -ExpandProperty Path
+
+            $analysis = Invoke-ScriptAnalyzer -Path $_.FullName -CustomRulePath $injectionHunterModulePath
+
+            foreach ($rule in $scriptAnalyzerRules) {
+                It "should pass $rule" {
+                    If ($analysis.RuleName -contains $rule) {
+                        $analysis | Where-Object RuleName -eq $rule -OutVariable failures
                         $failures.Count | Should -Be 0
                     }
                 }
