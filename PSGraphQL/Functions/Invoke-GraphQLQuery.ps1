@@ -169,6 +169,9 @@ function Invoke-GraphQLQuery {
         gql -q 'query { users { created_at id last_seen name } }' -u 'https://mytargetserver/v1/graphql' -r
 
         Sends a GraphQL query to an endpoint with the results returned as JSON (as a one-liner using aliases).
+    .INPUTS
+        System.IO.FileInfo
+            A System.IO.FileInfo object is received by the FilePath parameter.
     .LINK
         https://graphql.org/
         Format-Table
@@ -183,7 +186,7 @@ function Invoke-GraphQLQuery {
             ValueFromPipelineByPropertyName = $false,
             Position = 0)][ValidateLength(12, 1073741791)][Alias("Mutation", "Operation", "q", "m", "o")][System.String]$Query = "query introspection { __schema { types { name kind description } } }",
 
-        [Parameter(Mandatory = $false, ParameterSetName = "FilePath", Position = 0)][ValidateNotNullOrEmpty()][Alias('f', 'Path')][System.IO.FileInfo]$FilePath,
+        [Parameter(Mandatory = $false, ParameterSetName = "FilePath", ValueFromPipelineByPropertyName = $true, ValueFromPipeline = $true, Position = 0)][ValidateNotNullOrEmpty()][Alias('f', 'Path')][System.IO.FileInfo]$FilePath,
 
         [Parameter(Mandatory = $false,
             ValueFromPipelineByPropertyName = $false,
