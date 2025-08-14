@@ -13,7 +13,7 @@
     RootModule           = '.\PSGraphQL'
 
     # Version number of this module.
-    ModuleVersion        = '1.12.1'
+    ModuleVersion        = '2.0.0'
 
     # Compatibility
     CompatiblePSEditions = 'Desktop', 'Core'
