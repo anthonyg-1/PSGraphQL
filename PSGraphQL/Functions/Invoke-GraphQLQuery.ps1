@@ -44,7 +44,7 @@ function Invoke-GraphQLQuery {
                 "sides": 6
             }'
 
-        Invoke-GraphQLQuery -Query $query -Variables $variables -Uri $uri
+        Invoke-GraphQLQuery -Uri $uri -Query $query -Variables $variables
 
         Sends a GraphQL query to the endpoint 'https://mytargetserver/v1/graphql' with variables defined in $variables as JSON.
     .EXAMPLE
@@ -52,7 +52,7 @@ function Invoke-GraphQLQuery {
 
         $queryFilePath = "./queries/rolldice.gql"
 
-        Invoke-GraphQLQuery -FilePath $queryFilePath -Variables $variables -Uri $uri
+        Invoke-GraphQLQuery -Uri $uri -FilePath $queryFilePath -Variables $variables
 
         Sends a GraphQL query to the endpoint 'https://mytargetserver/v1/graphql' with the query defined in ./queries/rolldice.gql including variables defined in $variables as JSON.
     .EXAMPLE
@@ -65,7 +65,7 @@ function Invoke-GraphQLQuery {
 
         $variables = @{dice=3; sides=6}
 
-        Invoke-GraphQLQuery -Query $query -Variables $variables -Uri $uri
+        Invoke-GraphQLQuery -Uri $uri -Query $query -Variables $variables
 
         Sends a GraphQL query to the endpoint 'https://mytargetserver/v1/graphql' with variables defined in $variables.
     .EXAMPLE
@@ -83,7 +83,7 @@ function Invoke-GraphQLQuery {
             }
         '
 
-        Invoke-GraphQLQuery -Query $introspectionQuery -Uri $uri -Raw
+        Invoke-GraphQLQuery -Uri $uri -Query $introspectionQuery -Raw
 
         Sends a GraphQL introspection query to the endpoint 'https://mytargetserver/v1/graphql' with the results returned as JSON.
     .EXAMPLE
@@ -106,7 +106,7 @@ function Invoke-GraphQLQuery {
             }
         '
 
-        Invoke-GraphQLQuery -Query $myQuery -Uri $uri -Raw
+        Invoke-GraphQLQuery -Uri $uri -Query $myQuery -Raw
 
         Sends a GraphQL query to the endpoint 'https://mytargetserver/v1/graphql' with the results returned as JSON.
     .EXAMPLE
@@ -123,7 +123,7 @@ function Invoke-GraphQLQuery {
         }
         '
 
-        $result = Invoke-GraphQLQuery -Query $myQuery -Uri $uri
+        $result = Invoke-GraphQLQuery -Uri $uri -Query $myQuery
         $result.data.users | Format-Table
 
         Sends a GraphQL query to the endpoint 'https://mytargetserver/v1/graphql' with the results returned as objects and navigates the hierarchy to return a table view of users.
@@ -145,7 +145,7 @@ function Invoke-GraphQLQuery {
         }
         '
 
-        $result = Invoke-GraphQLQuery -Query $myQuery -Headers $headers -Uri $uri
+        $result = Invoke-GraphQLQuery -Uri $uri -Query $myQuery -Headers $headers
         $result.data.users | Format-Table
 
         Sends a GraphQL query using JWT for authentication to the endpoint 'https://mytargetserver/v1/graphql' with the results returned as objects and navigates the hierarchy to return a table view of users.
@@ -162,11 +162,11 @@ function Invoke-GraphQLQuery {
 
         $requestHeaders = @{ "x-api-key"="aoMGY{+93dx&t!5)VMu4pI8U8T.ULO" }
 
-        $jsonResult = Invoke-GraphQLQuery -Mutation $myMutation -Headers $requestHeaders -Uri $uri -Raw
+        $jsonResult = Invoke-GraphQLQuery -Uri $uri -Mutation $myMutation -Headers $requestHeaders -Raw
 
         Sends a GraphQL mutation to the endpoint 'https://mytargetserver/v1/graphql' with the results returned as JSON.
     .EXAMPLE
-        gql -q 'query { users { created_at id last_seen name } }' -u 'https://mytargetserver/v1/graphql' -r
+        gql -u 'https://mytargetserver/v1/graphql' -q 'query { users { created_at id last_seen name } }' -r
 
         Sends a GraphQL query to an endpoint with the results returned as JSON (as a one-liner using aliases).
     .INPUTS
@@ -182,33 +182,33 @@ function Invoke-GraphQLQuery {
     [OutputType([System.Management.Automation.PSCustomObject], [System.String], [GraphQLResponseObject])]
     Param
     (
+        [Parameter(Mandatory = $true,
+            ValueFromPipelineByPropertyName = $true, ValueFromPipeline = $true,
+            Position = 0)][Alias("u")][System.Uri]$Uri,
+
         [Parameter(Mandatory = $false, ParameterSetName = "Query",
             ValueFromPipelineByPropertyName = $false,
-            Position = 0)][ValidateLength(12, 1073741791)][Alias("Mutation", "Operation", "q", "m", "o")][System.String]$Query = "query introspection { __schema { types { name kind description } } }",
+            Position = 1)][ValidateLength(12, 1073741791)][Alias("Mutation", "Operation", "q", "m", "o")][System.String]$Query = "query introspection { __schema { types { name kind description } } }",
 
-        [Parameter(Mandatory = $false, ParameterSetName = "FilePath", ValueFromPipelineByPropertyName = $true, ValueFromPipeline = $true, Position = 0)][ValidateNotNullOrEmpty()][Alias('f', 'Path')][System.IO.FileInfo]$FilePath,
-
-        [Parameter(Mandatory = $false,
-            ValueFromPipelineByPropertyName = $false,
-            Position = 1)][ValidateLength(1, 4096)][Alias("op")][System.String]$OperationName,
+        [Parameter(Mandatory = $false, ParameterSetName = "FilePath", ValueFromPipelineByPropertyName = $true, ValueFromPipeline = $true, Position = 1)][ValidateNotNullOrEmpty()][Alias('f', 'Path')][System.IO.FileInfo]$FilePath,
 
         [Parameter(Mandatory = $false,
             ValueFromPipelineByPropertyName = $false,
-            Position = 2)][ValidateNotNullOrEmpty()][Alias("v", "Arguments")][Object]$Variables,
+            Position = 2)][ValidateLength(1, 4096)][Alias("op")][System.String]$OperationName,
 
         [Parameter(Mandatory = $false,
             ValueFromPipelineByPropertyName = $false,
-            Position = 3)][Alias("h")][System.Collections.Hashtable]$Headers,
-
-        [Parameter(Mandatory = $true,
-            ValueFromPipelineByPropertyName = $false,
-            Position = 4)][Alias("u")][System.Uri]$Uri,
+            Position = 3)][ValidateNotNullOrEmpty()][Alias("v", "Arguments")][Object]$Variables,
 
         [Parameter(Mandatory = $false,
             ValueFromPipelineByPropertyName = $false,
-            Position = 5)][Microsoft.PowerShell.Commands.WebRequestSession]$WebSession,
+            Position = 4)][Alias("h")][System.Collections.Hashtable]$Headers,
 
-        [Parameter(Mandatory = $false, Position = 6)][Alias("AsJson", "json", "r")][Switch]$Raw,
+        [Parameter(Mandatory = $false,
+            ValueFromPipelineByPropertyName = $false,
+            Position = 5)][Alias("ws")][Microsoft.PowerShell.Commands.WebRequestSession]$WebSession,
+
+        [Parameter(Mandatory = $false, Position = 6)][Alias("AsJson", "json", "r", "aj")][Switch]$Raw,
 
         [Parameter(Mandatory = $false,
             ValueFromPipelineByPropertyName = $false,
@@ -216,15 +216,15 @@ function Invoke-GraphQLQuery {
 
         [Parameter(ParameterSetName = "Query")]
         [Parameter(ParameterSetName = "FilePath")]
-        [Parameter(Mandatory = $false, ParameterSetName = "Detailed", Position = 7)][Switch]$Detailed,
+        [Parameter(Mandatory = $false, ParameterSetName = "Detailed", Position = 8)][Alias("d")][Switch]$Detailed,
 
         [Parameter(Mandatory = $false,
             ValueFromPipelineByPropertyName = $false,
-            Position = 8)][ValidateSet('Default', 'EscapeNonAscii', 'EscapeHtml')][Alias("eh")][System.String]$EscapeHandling = "Default",
+            Position = 9)][ValidateSet('Default', 'EscapeNonAscii', 'EscapeHtml')][Alias("eh")][System.String]$EscapeHandling = "Default",
 
         [Parameter(Mandatory = $false,
             ValueFromPipelineByPropertyName = $false,
-            Position = 9)][Alias("notls")][Switch]$SkipCertificateCheck
+            Position = 10)][Alias("notls", "scc", "insecure", "k")][Switch]$SkipCertificateCheck
     )
     BEGIN {
         # Return type when using the -Detailed switch:
@@ -245,6 +245,12 @@ function Invoke-GraphQLQuery {
     PROCESS {
         # The object that will ultimately be serialized and sent to the GraphQL endpoint:
         $jsonRequestObject = [ordered]@{ }
+
+        if (-not(Test-Uri -InputString $Uri)) {
+            $argumentExceptionMessage = "Provided value is not a valid URI."
+            $ArgumentException = New-Object ArgumentException -ArgumentList $argumentExceptionMessage
+            Write-Error -Exception $ArgumentException -Category InvalidArgument -ErrorAction Stop
+        }
 
         [string]$graphQlQuery = ""
         if ($PSBoundParameters.ContainsKey("FilePath")) {
@@ -316,12 +322,13 @@ function Invoke-GraphQLQuery {
             Write-Error -Exception $_.Exception -Category InvalidResult -ErrorAction Stop
         }
 
-        [HashTable]$params = @{Uri = $Uri
-            Method                 = "Post"
-            Body                   = $jsonRequestBody
-            ContentType            = $ContentType
-            ErrorAction            = "Stop"
-            UseBasicParsing        = $true
+        [HashTable]$params = @{
+            Uri             = $Uri
+            Method          = "Post"
+            Body            = $jsonRequestBody
+            ContentType     = $ContentType
+            ErrorAction     = "Stop"
+            UseBasicParsing = $true
         }
 
         # Skip TLS validation if PowerShell Core:
