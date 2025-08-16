@@ -105,17 +105,15 @@ function Get-GraphQLVariableList {
         $ArgumentException = New-Object -TypeName ArgumentException -ArgumentList "Not a valid GraphQL query or mutation. Verify syntax and try again."
 
         # Get the raw GraphQL query content
-        [string]$graphQlQuery = ""
+        [string]$graphQlQuery = $Query
+
         if ($PSBoundParameters.ContainsKey("FilePath")) {
-            try {
+            if (Test-Path -Path $FilePath) {
                 $graphQlQuery = Get-Content -Path $FilePath -Raw
             }
-            catch {
+            else {
                 Write-Error "Unable to read file at path: $FilePath" -Category ReadError -ErrorAction Stop
             }
-        }
-        else {
-            $graphQlQuery = $Query
         }
 
         # Ensure we have valid input
@@ -200,8 +198,8 @@ function Get-GraphQLVariableList {
             if ($line -match $variablePattern) {
                 foreach ($match in [regex]::Matches($line, $variablePattern)) {
                     $variables += [PSCustomObject]@{
-                        Name = $match.Groups[1].Value
-                        Type = $match.Groups[2].Value
+                        Name         = $match.Groups[1].Value
+                        Type         = $match.Groups[2].Value
                         DefaultValue = if ($match.Groups[3].Success) { $match.Groups[3].Value } else { $null }
                     }
                 }
