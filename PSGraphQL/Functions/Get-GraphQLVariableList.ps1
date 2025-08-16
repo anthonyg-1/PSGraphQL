@@ -104,70 +104,151 @@ function Get-GraphQLVariableList {
         # Exception to be used through the function in the case that an invalid GraphQL query or mutation is passed:
         $ArgumentException = New-Object -TypeName ArgumentException -ArgumentList "Not a valid GraphQL query or mutation. Verify syntax and try again."
 
+        # Get the raw GraphQL query content
         [string]$graphQlQuery = ""
         if ($PSBoundParameters.ContainsKey("FilePath")) {
-            $graphQlQuery = Get-Content -Path $FilePath -Raw
+            try {
+                $graphQlQuery = Get-Content -Path $FilePath -Raw
+            }
+            catch {
+                Write-Error "Unable to read file at path: $FilePath" -Category ReadError -ErrorAction Stop
+            }
         }
         else {
             $graphQlQuery = $Query
         }
 
-        # Compress and trim the incoming query for all operations within this function:
-        [string]$cleanedQueryInput = Compress-String -InputString $graphQlQuery
-
-        # Attempt to determine if value passed to the query parameter is an actual GraphQL query or mutation. If not, throw:
-        if (($cleanedQueryInput -notlike "query*") -and ($cleanedQueryInput -notlike "mutation*") ) {
+        # Ensure we have valid input
+        if ([string]::IsNullOrWhiteSpace($graphQlQuery)) {
             Write-Error -Exception $ArgumentException -Category InvalidArgument -ErrorAction Stop
         }
 
-        # Get the operation name and type via regex and splitting on the first space after query or mutation:
-        $matchOnParanOrCurlyRegex = '^[^\(|{]+'
-        $operationName = [regex]::Match(($cleanedQueryInput.Split(" ")[1]), $matchOnParanOrCurlyRegex) | Select-Object -ExpandProperty Value
-        $operationType = ([regex]::Match(($cleanedQueryInput.Split(" ")[0]), $matchOnParanOrCurlyRegex) | Select-Object -ExpandProperty Value).ToLower()
+        # Attempt to determine if value passed to the query parameter is an actual GraphQL query or mutation. If not, throw:
+        # Updated regex pattern to be more flexible with GraphQL operation detection
+        $graphqlOperationPattern = '^\s*(query|mutation|subscription)(\s+\w+)?\s*[\(\{]'
+        if (-not ($graphQlQuery -match $graphqlOperationPattern)) {
+            Write-Error -Exception $ArgumentException -Category InvalidArgument -ErrorAction Stop
+        }
 
         # List of objects that are returned by default:
-        $results = [List[GraphQLVariable]]::new()
+        $results = [System.Collections.Generic.List[GraphQLVariable]]::new()
 
-        # Run a regex against the incoming query looking for property name and type that does not return default parameter values:
-        [string]$queryNameAndTypeRegex = "(?<=\$)[_A-Za-z][_0-9A-Za-z]*:[\s]*\[*[_A-Za-z][_0-9A-Za-z]*\!?\]*\!?(?=[\x20-\xFF]*[,\)])"
-        $possibleMatches = [regex]::Matches($cleanedQueryInput, $queryNameAndTypeRegex)
+        # Ensure $results is properly initialized
+        if ($null -eq $results) {
+            $results = [System.Collections.Generic.List[GraphQLVariable]]::new()
+        }
 
-        # If we get matches, add to results list. Else, return a single object in the list containing the operation name only:
-        if ($possibleMatches.Count -gt 0) {
-            $possibleMatches | Select-Object -ExpandProperty Value | ForEach-Object {
-                $parameterName = ($_.Split(":")[0]).Trim()
-                $parameterType = ($_.Split(":")[1]).Trim()
+        # Updated parsing logic based on Parse-GraphQLVariables
+        # Regex to match variable definitions like $variableName: Type [= DefaultValue]
+        $variablePattern = '\$(\w+):\s*([\w\[\]!]+)(?:\s*=\s*(".*?"|\d+|\w+|\[.*?\]|\{.*?\}))?'
+        # Regex to detect operation start (query or mutation or subscription) - more flexible
+        $operationPattern = '^\s*(query|mutation|subscription)(\s+(\w+))?\s*[\(\{]'
 
+        # Split query into lines for processing
+        $lines = $graphQlQuery -split '\r?\n'
+        $currentOperation = $null
+        $currentOperationType = $null
+        $variables = @()
+
+        foreach ($line in $lines) {
+            # Trim whitespace
+            $line = $line.Trim()
+            # Skip empty lines or comments
+            if ([string]::IsNullOrWhiteSpace($line) -or $line.StartsWith('#')) {
+                continue
+            }
+
+            # Check for new operation (query or mutation or subscription)
+            if ($line -match $operationPattern) {
+                # If we were processing a previous operation, save its variables
+                if ($currentOperation -and $variables.Count -gt 0) {
+                    # Process variables for the previous operation
+                    foreach ($variable in $variables) {
+                        $gqlVariable = [GraphQLVariable]::new()
+                        $gqlVariable.HasVariables = $true
+                        $gqlVariable.Operation = $currentOperation
+                        $gqlVariable.OperationType = $currentOperationType
+                        $gqlVariable.Parameter = $variable.Name
+                        $gqlVariable.Type = ($variable.Type.Replace("!", "").Replace("[", "").Replace("]", ""))
+
+                        if ($variable.Type.Contains("!")) {
+                            $gqlVariable.Nullable = $false
+                        }
+                        else {
+                            $gqlVariable.Nullable = $true
+                        }
+
+                        if ($variable.Type.Contains("[") -and $variable.Type.Contains("]")) {
+                            $gqlVariable.IsArray = $true
+                        }
+                        else {
+                            $gqlVariable.IsArray = $false
+                        }
+
+                        $gqlVariable.RawType = $variable.Type
+                        $results.Add($gqlVariable)
+                    }
+                    $variables = @()
+                }
+
+                # Capture operation name (if provided) or type
+                $currentOperationType = $Matches[1].ToLower()
+                $currentOperation = if ($Matches[3]) { $Matches[3] } else { $Matches[1] }
+            }
+
+            # Check for variable definitions
+            if ($line -match $variablePattern) {
+                foreach ($match in [regex]::Matches($line, $variablePattern)) {
+                    $variables += [PSCustomObject]@{
+                        Name = $match.Groups[1].Value
+                        Type = $match.Groups[2].Value
+                        DefaultValue = if ($match.Groups[3].Success) { $match.Groups[3].Value } else { $null }
+                    }
+                }
+            }
+        }
+
+        # Save variables for the last operation
+        if ($currentOperation -and $variables.Count -gt 0) {
+            foreach ($variable in $variables) {
                 $gqlVariable = [GraphQLVariable]::new()
                 $gqlVariable.HasVariables = $true
-                $gqlVariable.Operation = $operationName
-                $gqlVariable.OperationType = $operationType
-                $gqlVariable.Parameter = $parameterName
-                $gqlVariable.Type = ($parameterType.Replace("!", "").Replace("[", "").Replace("]", ""))
+                $gqlVariable.Operation = $currentOperation
+                $gqlVariable.OperationType = $currentOperationType
+                $gqlVariable.Parameter = $variable.Name
+                $gqlVariable.Type = ($variable.Type.Replace("!", "").Replace("[", "").Replace("]", ""))
 
-                if ($parameterType.Contains("!")) {
+                if ($variable.Type.Contains("!")) {
                     $gqlVariable.Nullable = $false
                 }
                 else {
                     $gqlVariable.Nullable = $true
                 }
 
-                if ($parameterType.Contains("[") -and $parameterType.Contains("[")) {
+                if ($variable.Type.Contains("[") -and $variable.Type.Contains("]")) {
                     $gqlVariable.IsArray = $true
                 }
                 else {
                     $gqlVariable.IsArray = $false
                 }
 
-                $gqlVariable.RawType = $parameterType
+                $gqlVariable.RawType = $variable.Type
                 $results.Add($gqlVariable)
             }
         }
-        else {
-            $gqlVariable = [GraphQLVariable]::new()
-            $gqlVariable.Operation = $operationName
-            $gqlVariable.OperationType = $operationType
-            $results.Add($gqlVariable)
+
+        # If no operations with variables were found, return a single object with just operation info
+        if ($results.Count -eq 0) {
+            # Fallback to find at least one operation for basic info
+            if ($graphQlQuery -match $graphqlOperationPattern) {
+                $gqlVariable = [GraphQLVariable]::new()
+                $gqlVariable.Operation = if ($Matches[2]) { $Matches[2].Trim() } else { $Matches[1] }
+                $gqlVariable.OperationType = $Matches[1].ToLower()
+                $results.Add($gqlVariable)
+            }
+            else {
+                Write-Error -Exception $ArgumentException -Category InvalidArgument -ErrorAction Stop
+            }
         }
 
         return $results
