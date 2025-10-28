@@ -9,19 +9,11 @@ using namespace System.Collections.Generic
 #>
 
 
-#reegion Load Dependencies
-
-Import-Module Microsoft.PowerShell.Utility -Function Invoke-RestMethod, Invoke-WebRequest, ConvertFrom-Json, ConvertTo-Json -Force -ErrorAction Stop
-
-#endregion
-
-
 #region Load Public Functions
 
 Get-ChildItem -Path $PSScriptRoot\Functions\*.ps1 | Foreach-Object { . $_.FullName }
 
 #endregion
-
 
 
 #region Load Private Functions
