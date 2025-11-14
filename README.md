@@ -17,7 +17,7 @@ Install-Module -Name PSGraphQL -Repository PSGallery -Scope CurrentUser
 
 ## Examples
 
-### Send a GraphQL query to an endpoint including operation name and variables
+### Post a GraphQL query to an endpoint including operation name and variables
 ```powershell
 
 $uri = "https://mytargetserver/v1/graphql"
@@ -38,7 +38,7 @@ $variables = '
 Invoke-GraphQLQuery -Query $query -OperationName $opName -Variables $variables -Uri $uri       
 ```
 
-### Send a GraphQL query with a query defined in a file
+### Post a GraphQL query with a query defined in a file
 ```powershell
 $uri = "https://mytargetserver/v1/graphql"
 
@@ -47,7 +47,7 @@ $queryFilePath = "./queries/rolldice.gql"
 Invoke-GraphQLQuery -FilePath $queryFilePath -Uri $uri
 ```
 
-### Send a GraphQL query to an endpoint including operation name and variables as a HashTable
+### Post a GraphQL query to an endpoint including operation name and variables as a HashTable
 ```powershell
 
 $uri = "https://mytargetserver/v1/graphql"
@@ -63,7 +63,7 @@ $variables = @{dice=3; sides=6}
 Invoke-GraphQLQuery -Query $query -OperationName $opName -Variables $variables -Uri $uri       
 ```
 
-### Send a GraphQL introspection query to an endpoint with the results returned as JSON
+### Post a GraphQL introspection query to an endpoint with the results returned as JSON
 
 ```powershell
 $uri = "https://mytargetserver/v1/graphql"
@@ -83,7 +83,7 @@ $introspectionQuery = '
 Invoke-GraphQLQuery -Query $introspectionQuery -Uri $uri -Raw
 ```
 
-### Send a GraphQL query to an endpoint with the results returned as objects
+### Post a GraphQL query to an endpoint with the results returned as objects
 
 ```powershell
 $uri = "https://mytargetserver/v1/graphql"
@@ -102,7 +102,7 @@ $myQuery = '
 Invoke-GraphQLQuery -Query $myQuery -Uri $uri
 ```
 
-### Send a GraphQL mutation to an endpoint with the results returned as JSON
+### Post a GraphQL mutation to an endpoint with the results returned as JSON
 
 ```powershell
 $uri = "https://mytargetserver/v1/graphql"
@@ -120,7 +120,7 @@ $requestHeaders = @{ "x-api-key"='aoMGY{+93dx&t!5)VMu4pI8U8T.ULO' }
 $jsonResult = Invoke-GraphQLQuery -Mutation $myMutation -Headers $requestHeaders -Uri $uri -Raw
 ```
 
-### Send a GraphQL query using JWT for authentication to an endpoint and navigate the results
+### Post a GraphQL query using JWT for authentication to an endpoint and navigate the results
 
 ```powershell
 $jwt = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MjAzOTMwMjgsIm5iZiI6MTYyMDM5MzAyNywiZXhwIjoxNjIwMzkzMzI4LCJzdWIiOiJtZUBjb21wYW55LmNvbSIsImp0aSI6ImMwZTk0ZTY0ODc4ZjRlZDFhZWM3YWYwYzViOWM2ZWI5Iiwicm9sZSI6InVzZXIifQ.HaTXDunEjmyUsHs7daLe-AxEpmq58QqqFziydm7MBic"
@@ -144,7 +144,7 @@ $result = Invoke-GraphQLQuery -Query $myQuery -Headers $headers -Uri $uri
 $result.data.users | Format-Table
 ```
 
-### Send a GraphQL query to an endpoint with the results returned as JSON (as a one-liner using aliases)
+### Post a GraphQL query to an endpoint with the results returned as JSON (as a one-liner using aliases)
 
 ```powershell
 gql -q 'query { users { created_at id last_seen name } }' -u 'https://mytargetserver/v1/graphql' -r
@@ -235,7 +235,7 @@ query {
 # For 1 to $amountOfQueries, concatenate $sysUpdateQuery and assign to $batchQueryAttackPayload:
 $batchQueryAttackPayload = ((1..$amountOfQueries | ForEach-Object { $sysUpdateQuery }).Trim()) -join "`r`n"
 
-# Send batch attack to GraphQL endpoint:
+# Post batch attack to GraphQL endpoint:
 Invoke-GraphQLQuery -Uri $gqlEndpointUri -Query $batchQueryAttackPayload
 ```
 
